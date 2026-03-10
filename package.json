@@ -17,7 +17,6 @@
   "dependencies": {
     "@adonisjs/core": "^6.7.0",
     "@adonisjs/lucid": "^20.0.0",
-    "@adonisjs/auth": "^10.0.0",
     "@adonisjs/cors": "^5.0.0",
     "pg": "^8.11.3",
     "mysql2": "^3.9.0"
