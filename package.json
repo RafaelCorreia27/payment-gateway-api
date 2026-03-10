@@ -1,0 +1,35 @@
+{
+  "name": "payment-gateway-api",
+  "version": "1.0.0",
+  "description": "Payment Gateway API - Projeto desenvolvido como teste técnico backend",
+  "main": "server.js",
+  "scripts": {
+    "build": "node ace build",
+    "start": "node server.js",
+    "dev": "node ace serve --watch",
+    "test": "node --test",
+    "lint": "eslint . --ext=.ts",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@adonisjs/core": "^6.7.0",
+    "@adonisjs/lucid": "^20.0.0",
+    "@adonisjs/auth": "^10.0.0",
+    "@adonisjs/cors": "^5.0.0",
+    "pg": "^8.11.3",
+    "mysql2": "^3.9.0"
+  },
+  "devDependencies": {
+    "@adonisjs/types": "^6.0.0",
+    "@adonisjs/eslint-config": "^1.0.0",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0"
+  }
+}

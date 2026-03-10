@@ -1,0 +1,17 @@
+{
+  "extends": "@adonisjs/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./build",
+    "rootDir": "./",
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": [
+    "**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "tmp"
+  ]
+}
