@@ -18,13 +18,17 @@
     "@adonisjs/core": "^6.7.0",
     "@adonisjs/lucid": "^20.0.0",
     "@adonisjs/cors": "^5.0.0",
+    "@adonisjs/vinejs": "^1.11.0",
     "pg": "^8.11.3",
-    "mysql2": "^3.9.0"
+    "mysql2": "^3.9.0",
+    "axios": "^1.6.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@adonisjs/types": "^6.0.0",
     "@adonisjs/eslint-config": "^1.0.0",
     "@types/node": "^20.11.0",
+    "@types/jsonwebtoken": "^9.0.5",
     "typescript": "^5.3.3",
     "eslint": "^8.56.0",
     "prettier": "^3.2.4",
