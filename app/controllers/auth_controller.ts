@@ -1,0 +1,75 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import User from '#models/user'
+import { loginValidator } from '#validators/login_validator'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import env from '#start/env'
+
+export default class AuthController {
+  /**
+   * Realiza login do usuário e retorna token JWT
+   * POST /login
+   */
+  async login({ request, response }: HttpContext) {
+    try {
+      // Valida os dados de entrada
+      const { email, password } = await request.validateUsing(loginValidator)
+
+      // Busca o usuário pelo email
+      const user = await User.findBy('email', email)
+
+      // Verifica se o usuário existe
+      if (!user) {
+        return response.unauthorized({
+          message: 'Invalid credentials',
+        })
+      }
+
+      // Verifica se a senha está correta
+      const isPasswordValid = await bcrypt.compare(password, user.password)
+
+      if (!isPasswordValid) {
+        return response.unauthorized({
+          message: 'Invalid credentials',
+        })
+      }
+
+      // Gera o token JWT
+      const token = jwt.sign(
+        {
+          userId: user.id,
+          email: user.email,
+          role: user.role,
+        },
+        env.get('JWT_SECRET'),
+        {
+          expiresIn: env.get('JWT_EXPIRES_IN'),
+        }
+      )
+
+      // Retorna o token e informações do usuário (sem senha)
+      return response.ok({
+        message: 'Login successful',
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        },
+      })
+    } catch (error) {
+      // Se for erro de validação, retorna erro 422
+      if (error.messages) {
+        return response.unprocessableEntity({
+          message: 'Validation failed',
+          errors: error.messages,
+        })
+      }
+
+      // Outros erros
+      return response.internalServerError({
+        message: 'An error occurred during login',
+      })
+    }
+  }
+}
