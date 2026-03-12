@@ -3,6 +3,7 @@ import User from '#models/user'
 import { createUserValidator } from '#validators/create_user_validator'
 import { updateUserValidator } from '#validators/update_user_validator'
 import bcrypt from 'bcrypt'
+import { ApiResponse } from '#services/api_response'
 
 /**
  * Controller responsável por gerenciar usuários (CRUD)
@@ -27,21 +28,29 @@ export default class UserController {
     try {
       const users = await User.all()
 
-      return response.ok({
-        message: 'Users retrieved successfully',
-        users: users.map((user) => ({
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        })),
-      })
+      return response.ok(
+        ApiResponse.success(
+          {
+            users: users.map((user) => ({
+              id: user.id,
+              email: user.email,
+              role: user.role,
+              createdAt: user.createdAt,
+              updatedAt: user.updatedAt,
+            })),
+          },
+          'Users retrieved successfully'
+        )
+      )
     } catch (error) {
       console.error('[UserController] Error in index:', error)
-      return response.internalServerError({
-        message: 'An error occurred while retrieving users',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while retrieving users',
+          null,
+          'USER_LIST_ERROR'
+        )
+      )
     }
   }
 
@@ -56,26 +65,32 @@ export default class UserController {
       const user = await User.find(params.id)
 
       if (!user) {
-        return response.notFound({
-          message: 'User not found',
-        })
+        return response.notFound(ApiResponse.error('User not found', null, 'NOT_FOUND'))
       }
 
-      return response.ok({
-        message: 'User retrieved successfully',
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
-      })
+      return response.ok(
+        ApiResponse.success(
+          {
+            user: {
+              id: user.id,
+              email: user.email,
+              role: user.role,
+              createdAt: user.createdAt,
+              updatedAt: user.updatedAt,
+            },
+          },
+          'User retrieved successfully'
+        )
+      )
     } catch (error) {
       console.error('[UserController] Error in show:', error)
-      return response.internalServerError({
-        message: 'An error occurred while retrieving user',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while retrieving user',
+          null,
+          'USER_SHOW_ERROR'
+        )
+      )
     }
   }
 
@@ -94,9 +109,9 @@ export default class UserController {
       // Verifica se email já existe (validação adicional)
       const existingUser = await User.findBy('email', data.email)
       if (existingUser) {
-        return response.unprocessableEntity({
-          message: 'Email already exists',
-        })
+        return response.unprocessableEntity(
+          ApiResponse.error('Email already exists', null, 'EMAIL_ALREADY_EXISTS')
+        )
       }
 
       // Hash da senha
@@ -109,28 +124,35 @@ export default class UserController {
         role: data.role || 'USER', // Padrão: USER
       })
 
-      return response.created({
-        message: 'User created successfully',
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          createdAt: user.createdAt,
-        },
-      })
+      return response.created(
+        ApiResponse.success(
+          {
+            user: {
+              id: user.id,
+              email: user.email,
+              role: user.role,
+              createdAt: user.createdAt,
+            },
+          },
+          'User created successfully'
+        )
+      )
     } catch (error) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
-        return response.unprocessableEntity({
-          message: 'Validation failed',
-          errors: error.messages,
-        })
+        return response.unprocessableEntity(
+          ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')
+        )
       }
 
       console.error('[UserController] Error in store:', error)
-      return response.internalServerError({
-        message: 'An error occurred while creating user',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while creating user',
+          null,
+          'USER_CREATE_ERROR'
+        )
+      )
     }
   }
 
@@ -147,9 +169,7 @@ export default class UserController {
       const user = await User.find(params.id)
 
       if (!user) {
-        return response.notFound({
-          message: 'User not found',
-        })
+        return response.notFound(ApiResponse.error('User not found', null, 'NOT_FOUND'))
       }
 
       // Valida dados de entrada
@@ -159,9 +179,9 @@ export default class UserController {
       if (data.email && data.email !== user.email) {
         const existingUser = await User.findBy('email', data.email)
         if (existingUser) {
-          return response.unprocessableEntity({
-            message: 'Email already exists',
-          })
+          return response.unprocessableEntity(
+            ApiResponse.error('Email already exists', null, 'EMAIL_ALREADY_EXISTS')
+          )
         }
         user.email = data.email
       }
@@ -178,28 +198,35 @@ export default class UserController {
 
       await user.save()
 
-      return response.ok({
-        message: 'User updated successfully',
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          updatedAt: user.updatedAt,
-        },
-      })
+      return response.ok(
+        ApiResponse.success(
+          {
+            user: {
+              id: user.id,
+              email: user.email,
+              role: user.role,
+              updatedAt: user.updatedAt,
+            },
+          },
+          'User updated successfully'
+        )
+      )
     } catch (error) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
-        return response.unprocessableEntity({
-          message: 'Validation failed',
-          errors: error.messages,
-        })
+        return response.unprocessableEntity(
+          ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')
+        )
       }
 
       console.error('[UserController] Error in update:', error)
-      return response.internalServerError({
-        message: 'An error occurred while updating user',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while updating user',
+          null,
+          'USER_UPDATE_ERROR'
+        )
+      )
     }
   }
 
@@ -214,21 +241,21 @@ export default class UserController {
       const user = await User.find(params.id)
 
       if (!user) {
-        return response.notFound({
-          message: 'User not found',
-        })
+        return response.notFound(ApiResponse.error('User not found', null, 'NOT_FOUND'))
       }
 
       await user.delete()
 
-      return response.ok({
-        message: 'User deleted successfully',
-      })
+      return response.ok(ApiResponse.success(null, 'User deleted successfully'))
     } catch (error) {
       console.error('[UserController] Error in destroy:', error)
-      return response.internalServerError({
-        message: 'An error occurred while deleting user',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while deleting user',
+          null,
+          'USER_DELETE_ERROR'
+        )
+      )
     }
   }
 }

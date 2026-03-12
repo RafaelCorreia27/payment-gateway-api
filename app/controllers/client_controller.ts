@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Client from '#models/client'
+import { ApiResponse } from '#services/api_response'
 
 /**
  * Controller responsável por visualizar clientes
@@ -21,21 +22,29 @@ export default class ClientController {
     try {
       const clients = await Client.all()
 
-      return response.ok({
-        message: 'Clients retrieved successfully',
-        clients: clients.map((client) => ({
-          id: client.id,
-          name: client.name,
-          email: client.email,
-          createdAt: client.createdAt,
-          updatedAt: client.updatedAt,
-        })),
-      })
+      return response.ok(
+        ApiResponse.success(
+          {
+            clients: clients.map((client) => ({
+              id: client.id,
+              name: client.name,
+              email: client.email,
+              createdAt: client.createdAt,
+              updatedAt: client.updatedAt,
+            })),
+          },
+          'Clients retrieved successfully'
+        )
+      )
     } catch (error) {
       console.error('[ClientController] Error in index:', error)
-      return response.internalServerError({
-        message: 'An error occurred while retrieving clients',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while retrieving clients',
+          null,
+          'CLIENT_LIST_ERROR'
+        )
+      )
     }
   }
 
@@ -50,9 +59,7 @@ export default class ClientController {
       const client = await Client.find(params.id)
 
       if (!client) {
-        return response.notFound({
-          message: 'Client not found',
-        })
+        return response.notFound(ApiResponse.error('Client not found', null, 'NOT_FOUND'))
       }
 
       // Carrega transações do cliente com relacionamentos
@@ -88,22 +95,30 @@ export default class ClientController {
         updatedAt: transaction.updatedAt,
       }))
 
-      return response.ok({
-        message: 'Client retrieved successfully',
-        client: {
-          id: client.id,
-          name: client.name,
-          email: client.email,
-          createdAt: client.createdAt,
-          updatedAt: client.updatedAt,
-          transactions,
-        },
-      })
+      return response.ok(
+        ApiResponse.success(
+          {
+            client: {
+              id: client.id,
+              name: client.name,
+              email: client.email,
+              createdAt: client.createdAt,
+              updatedAt: client.updatedAt,
+              transactions,
+            },
+          },
+          'Client retrieved successfully'
+        )
+      )
     } catch (error) {
       console.error('[ClientController] Error in show:', error)
-      return response.internalServerError({
-        message: 'An error occurred while retrieving client',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while retrieving client',
+          null,
+          'CLIENT_SHOW_ERROR'
+        )
+      )
     }
   }
 }

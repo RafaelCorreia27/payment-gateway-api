@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Product from '#models/product'
 import { createProductValidator } from '#validators/create_product_validator'
 import { updateProductValidator } from '#validators/update_product_validator'
+import { ApiResponse } from '#services/api_response'
 
 /**
  * Controller responsável por gerenciar produtos (CRUD)
@@ -26,21 +27,29 @@ export default class ProductController {
     try {
       const products = await Product.all()
 
-      return response.ok({
-        message: 'Products retrieved successfully',
-        products: products.map((product) => ({
-          id: product.id,
-          name: product.name,
-          amount: product.amount, // Valor em centavos
-          createdAt: product.createdAt,
-          updatedAt: product.updatedAt,
-        })),
-      })
+      return response.ok(
+        ApiResponse.success(
+          {
+            products: products.map((product) => ({
+              id: product.id,
+              name: product.name,
+              amount: product.amount, // Valor em centavos
+              createdAt: product.createdAt,
+              updatedAt: product.updatedAt,
+            })),
+          },
+          'Products retrieved successfully'
+        )
+      )
     } catch (error) {
       console.error('[ProductController] Error in index:', error)
-      return response.internalServerError({
-        message: 'An error occurred while retrieving products',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while retrieving products',
+          null,
+          'PRODUCT_LIST_ERROR'
+        )
+      )
     }
   }
 
@@ -55,26 +64,32 @@ export default class ProductController {
       const product = await Product.find(params.id)
 
       if (!product) {
-        return response.notFound({
-          message: 'Product not found',
-        })
+        return response.notFound(ApiResponse.error('Product not found', null, 'NOT_FOUND'))
       }
 
-      return response.ok({
-        message: 'Product retrieved successfully',
-        product: {
-          id: product.id,
-          name: product.name,
-          amount: product.amount, // Valor em centavos
-          createdAt: product.createdAt,
-          updatedAt: product.updatedAt,
-        },
-      })
+      return response.ok(
+        ApiResponse.success(
+          {
+            product: {
+              id: product.id,
+              name: product.name,
+              amount: product.amount, // Valor em centavos
+              createdAt: product.createdAt,
+              updatedAt: product.updatedAt,
+            },
+          },
+          'Product retrieved successfully'
+        )
+      )
     } catch (error) {
       console.error('[ProductController] Error in show:', error)
-      return response.internalServerError({
-        message: 'An error occurred while retrieving product',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while retrieving product',
+          null,
+          'PRODUCT_SHOW_ERROR'
+        )
+      )
     }
   }
 
@@ -95,28 +110,35 @@ export default class ProductController {
         amount: data.amount, // Valor em centavos
       })
 
-      return response.created({
-        message: 'Product created successfully',
-        product: {
-          id: product.id,
-          name: product.name,
-          amount: product.amount,
-          createdAt: product.createdAt,
-        },
-      })
+      return response.created(
+        ApiResponse.success(
+          {
+            product: {
+              id: product.id,
+              name: product.name,
+              amount: product.amount,
+              createdAt: product.createdAt,
+            },
+          },
+          'Product created successfully'
+        )
+      )
     } catch (error) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
-        return response.unprocessableEntity({
-          message: 'Validation failed',
-          errors: error.messages,
-        })
+        return response.unprocessableEntity(
+          ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')
+        )
       }
 
       console.error('[ProductController] Error in store:', error)
-      return response.internalServerError({
-        message: 'An error occurred while creating product',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while creating product',
+          null,
+          'PRODUCT_CREATE_ERROR'
+        )
+      )
     }
   }
 
@@ -132,9 +154,7 @@ export default class ProductController {
       const product = await Product.find(params.id)
 
       if (!product) {
-        return response.notFound({
-          message: 'Product not found',
-        })
+        return response.notFound(ApiResponse.error('Product not found', null, 'NOT_FOUND'))
       }
 
       // Valida dados de entrada
@@ -151,28 +171,35 @@ export default class ProductController {
 
       await product.save()
 
-      return response.ok({
-        message: 'Product updated successfully',
-        product: {
-          id: product.id,
-          name: product.name,
-          amount: product.amount,
-          updatedAt: product.updatedAt,
-        },
-      })
+      return response.ok(
+        ApiResponse.success(
+          {
+            product: {
+              id: product.id,
+              name: product.name,
+              amount: product.amount,
+              updatedAt: product.updatedAt,
+            },
+          },
+          'Product updated successfully'
+        )
+      )
     } catch (error) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
-        return response.unprocessableEntity({
-          message: 'Validation failed',
-          errors: error.messages,
-        })
+        return response.unprocessableEntity(
+          ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')
+        )
       }
 
       console.error('[ProductController] Error in update:', error)
-      return response.internalServerError({
-        message: 'An error occurred while updating product',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while updating product',
+          null,
+          'PRODUCT_UPDATE_ERROR'
+        )
+      )
     }
   }
 
@@ -188,21 +215,21 @@ export default class ProductController {
       const product = await Product.find(params.id)
 
       if (!product) {
-        return response.notFound({
-          message: 'Product not found',
-        })
+        return response.notFound(ApiResponse.error('Product not found', null, 'NOT_FOUND'))
       }
 
       await product.delete()
 
-      return response.ok({
-        message: 'Product deleted successfully',
-      })
+      return response.ok(ApiResponse.success(null, 'Product deleted successfully'))
     } catch (error) {
       console.error('[ProductController] Error in destroy:', error)
-      return response.internalServerError({
-        message: 'An error occurred while deleting product',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while deleting product',
+          null,
+          'PRODUCT_DELETE_ERROR'
+        )
+      )
     }
   }
 }
