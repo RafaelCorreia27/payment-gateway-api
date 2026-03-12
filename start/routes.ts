@@ -9,6 +9,8 @@
 
 import router from '@adonisjs/core/services/router'
 import AuthController from '#controllers/auth_controller'
+import AuthMiddleware from '#middleware/auth_middleware'
+import roleMiddleware from '#middleware/role_middleware'
 
 // Rota de teste
 router.get('/', async () => {
@@ -23,3 +25,25 @@ router.get('/', async () => {
 
 // Autenticação
 router.post('/login', [AuthController, 'login'])
+
+// ============================================
+// Rotas Privadas (requerem autenticação)
+// ============================================
+
+// Exemplo de rota protegida (requer autenticação)
+router.get('/me', [AuthMiddleware], async ({ authUser, response }) => {
+  return response.ok({
+    user: {
+      id: authUser!.id,
+      email: authUser!.email,
+      role: authUser!.role,
+    },
+  })
+})
+
+// Exemplo de rota protegida com role específica (requer ADMIN ou MANAGER)
+router.get('/admin-only', [AuthMiddleware, roleMiddleware(['ADMIN', 'MANAGER'])], async ({ response }) => {
+  return response.ok({
+    message: 'This route is only accessible to ADMIN or MANAGER users',
+  })
+})

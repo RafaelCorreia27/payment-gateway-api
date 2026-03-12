@@ -1,0 +1,287 @@
+{
+  "collection": {
+    "info": {
+      "_postman_id": "3e618a0f-a01b-4186-9b99-dec8d1affbb9",
+      "name": "Multi-Gateways Mock APIs",
+      "description": "Para iniciar os mocks:\n\n**Com autenticação:**\n\n``` bash\ndocker run -p 3001:3001 -p 3002:3002 matheusprotzen/gateways-mock\n\n ```\n\n**Sem autenticação:**\n\n``` bash\ndocker run -p 3001:3001 -p 3002:3002 -e REMOVE_AUTH='true' matheusprotzen/gateways-mock\n\n ```",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "createdAt": "2024-11-13T15:55:39.000Z",
+      "updatedAt": "2024-11-13T15:57:31.000Z",
+      "lastUpdatedBy": "37798616",
+      "uid": "37798616-3e618a0f-a01b-4186-9b99-dec8d1affbb9"
+    },
+    "item": [
+      {
+        "name": "Gateway 1",
+        "item": [
+          {
+            "name": "Login",
+            "id": "7ad0057c-530b-46d3-b99c-4a76bd7a4a87",
+            "protocolProfileBehavior": {
+              "disableBodyPruning": true
+            },
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"email\": \"dev@betalent.tech\",\n    \"token\": \"FEC9BB078BF338F464F96B48089EB498\"\n}"
+              },
+              "url": {
+                "raw": "http://localhost:3001/login",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "3001",
+                "path": ["login"]
+              }
+            },
+            "response": [],
+            "createdAt": "2024-11-13T15:55:39.000Z",
+            "updatedAt": "2024-11-13T15:55:39.000Z",
+            "uid": "37798616-7ad0057c-530b-46d3-b99c-4a76bd7a4a87"
+          },
+          {
+            "name": "List Transactions",
+            "id": "34c7b934-975b-432a-9ebb-a693642fc17c",
+            "protocolProfileBehavior": {
+              "disableBodyPruning": true
+            },
+            "request": {
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{gateway1_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:3001/transactions",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "3001",
+                "path": ["transactions"]
+              }
+            },
+            "response": [],
+            "createdAt": "2024-11-13T15:55:39.000Z",
+            "updatedAt": "2024-11-13T15:55:39.000Z",
+            "uid": "37798616-34c7b934-975b-432a-9ebb-a693642fc17c"
+          },
+          {
+            "name": "Create Transaction",
+            "id": "6d3329ba-3a48-43c1-94b4-bc5bb9968864",
+            "protocolProfileBehavior": {
+              "disableBodyPruning": true
+            },
+            "request": {
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{gateway1_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"amount\": 1000,\n    \"name\": \"tester\",\n    \"email\": \"tester@email.com\",\n    \"cardNumber\": \"5569000000006063\",\n    \"cvv\": \"010\"\n}"
+              },
+              "url": {
+                "raw": "http://localhost:3001/transactions",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "3001",
+                "path": ["transactions"]
+              }
+            },
+            "response": [],
+            "createdAt": "2024-11-13T15:55:39.000Z",
+            "updatedAt": "2024-11-13T15:55:39.000Z",
+            "uid": "37798616-6d3329ba-3a48-43c1-94b4-bc5bb9968864"
+          },
+          {
+            "name": "Chargeback",
+            "id": "aacfae77-1781-4547-94d9-847b2e5ef459",
+            "protocolProfileBehavior": {
+              "disableBodyPruning": true
+            },
+            "request": {
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{gateway1_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "method": "POST",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:3001/transactions/:id/charge_back",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "3001",
+                "path": ["transactions", ":id", "charge_back"],
+                "variable": [
+                  {
+                    "id": "9bc2ce39-ffad-481e-ac48-038b34e9b942",
+                    "key": "id",
+                    "value": "",
+                    "description": "ID da transação"
+                  }
+                ]
+              }
+            },
+            "response": [],
+            "createdAt": "2024-11-13T15:55:39.000Z",
+            "updatedAt": "2024-11-13T15:55:39.000Z",
+            "uid": "37798616-aacfae77-1781-4547-94d9-847b2e5ef459"
+          }
+        ],
+        "id": "bb33be90-5229-4727-80ed-8afcc6e97f8e",
+        "createdAt": "2024-11-13T15:55:39.000Z",
+        "updatedAt": "2024-11-13T15:55:39.000Z",
+        "uid": "37798616-bb33be90-5229-4727-80ed-8afcc6e97f8e"
+      },
+      {
+        "name": "Gateway 2",
+        "item": [
+          {
+            "name": "Listar Transações",
+            "id": "6b48160e-71c4-40e6-8a04-b31595b8ca7d",
+            "protocolProfileBehavior": {
+              "disableBodyPruning": true
+            },
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Gateway-Auth-Token",
+                  "value": "tk_f2198cc671b5289fa856"
+                },
+                {
+                  "key": "Gateway-Auth-Secret",
+                  "value": "3d15e8ed6131446ea7e3456728b1211f"
+                }
+              ],
+              "url": {
+                "raw": "http://localhost:3002/transacoes",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "3002",
+                "path": ["transacoes"]
+              }
+            },
+            "response": [],
+            "createdAt": "2024-11-13T15:55:39.000Z",
+            "updatedAt": "2024-11-13T15:55:39.000Z",
+            "uid": "37798616-6b48160e-71c4-40e6-8a04-b31595b8ca7d"
+          },
+          {
+            "name": "Criar Transação",
+            "id": "26f45326-b92c-4179-9424-2cba3cfe2c43",
+            "protocolProfileBehavior": {
+              "disableBodyPruning": true
+            },
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Gateway-Auth-Token",
+                  "value": "tk_f2198cc671b5289fa856"
+                },
+                {
+                  "key": "Gateway-Auth-Secret",
+                  "value": "3d15e8ed6131446ea7e3456728b1211f"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"valor\": 1000,\n    \"nome\": \"tester\",\n    \"email\": \"tester@email.com\",\n    \"numeroCartao\": \"5569000000006063\",\n    \"cvv\": \"010\"\n}"
+              },
+              "url": {
+                "raw": "http://localhost:3002/transacoes",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "3002",
+                "path": ["transacoes"]
+              }
+            },
+            "response": [],
+            "createdAt": "2024-11-13T15:55:39.000Z",
+            "updatedAt": "2024-11-13T15:55:39.000Z",
+            "uid": "37798616-26f45326-b92c-4179-9424-2cba3cfe2c43"
+          },
+          {
+            "name": "Reembolso",
+            "id": "736d29f3-463a-4923-9b48-bd2985227454",
+            "protocolProfileBehavior": {
+              "disableBodyPruning": true
+            },
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Gateway-Auth-Token",
+                  "value": "tk_f2198cc671b5289fa856"
+                },
+                {
+                  "key": "Gateway-Auth-Secret",
+                  "value": "3d15e8ed6131446ea7e3456728b1211f"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"id\": \"3d15e8ed-6131-446e-a7e3-456728b1211f\"\n}"
+              },
+              "url": {
+                "raw": "http://localhost:3002/transacoes/reembolso",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "3002",
+                "path": ["transacoes", "reembolso"]
+              }
+            },
+            "response": [],
+            "createdAt": "2024-11-13T15:55:39.000Z",
+            "updatedAt": "2024-11-13T15:55:39.000Z",
+            "uid": "37798616-736d29f3-463a-4923-9b48-bd2985227454"
+          }
+        ],
+        "id": "aab9289f-d81d-4064-a76e-395d1d541412",
+        "createdAt": "2024-11-13T15:55:39.000Z",
+        "updatedAt": "2024-11-13T15:55:39.000Z",
+        "uid": "37798616-aab9289f-d81d-4064-a76e-395d1d541412"
+      }
+    ]
+  }
+}
