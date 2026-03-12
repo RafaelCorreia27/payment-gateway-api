@@ -14,6 +14,7 @@ import GatewayController from '#controllers/gateway_controller'
 import UserController from '#controllers/user_controller'
 import ProductController from '#controllers/product_controller'
 import ClientController from '#controllers/client_controller'
+import TransactionController from '#controllers/transaction_controller'
 import AuthMiddleware from '#middleware/auth_middleware'
 import roleMiddleware from '#middleware/role_middleware'
 import { UserRole } from '#types/user_role'
@@ -95,3 +96,19 @@ router
     router.get('/clients/:id', [ClientController, 'show'])
   })
   .use([AuthMiddleware])
+
+// Transações (requer autenticação - qualquer role para visualizar)
+router
+  .group(() => {
+    router.get('/transactions', [TransactionController, 'index'])
+    router.get('/transactions/:id', [TransactionController, 'show'])
+  })
+  .use([AuthMiddleware])
+
+// Reembolso de transações (requer ADMIN ou FINANCE)
+router.post('/transactions/:id/refund', [
+  AuthMiddleware,
+  roleMiddleware([UserRole.ADMIN, UserRole.FINANCE]),
+  TransactionController,
+  'refund',
+])
