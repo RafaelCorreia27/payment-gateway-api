@@ -11,6 +11,7 @@ import router from '@adonisjs/core/services/router'
 import AuthController from '#controllers/auth_controller'
 import PurchaseController from '#controllers/purchase_controller'
 import GatewayController from '#controllers/gateway_controller'
+import UserController from '#controllers/user_controller'
 import AuthMiddleware from '#middleware/auth_middleware'
 import roleMiddleware from '#middleware/role_middleware'
 import { UserRole } from '#types/user_role'
@@ -60,5 +61,16 @@ router
     router.patch('/gateways/:id/toggle', [GatewayController, 'toggle'])
     router.patch('/gateways/:id/priority', [GatewayController, 'updatePriority'])
     router.patch('/gateways/:id', [GatewayController, 'update'])
+  })
+  .use([AuthMiddleware, roleMiddleware([UserRole.ADMIN, UserRole.MANAGER])])
+
+// Usuários (requer ADMIN ou MANAGER)
+router
+  .group(() => {
+    router.get('/users', [UserController, 'index'])
+    router.get('/users/:id', [UserController, 'show'])
+    router.post('/users', [UserController, 'store'])
+    router.put('/users/:id', [UserController, 'update'])
+    router.delete('/users/:id', [UserController, 'destroy'])
   })
   .use([AuthMiddleware, roleMiddleware([UserRole.ADMIN, UserRole.MANAGER])])
