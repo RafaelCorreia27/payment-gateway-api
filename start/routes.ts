@@ -9,6 +9,7 @@
 
 import router from '@adonisjs/core/services/router'
 import AuthController from '#controllers/auth_controller'
+import PurchaseController from '#controllers/purchase_controller'
 import AuthMiddleware from '#middleware/auth_middleware'
 import roleMiddleware from '#middleware/role_middleware'
 
@@ -25,6 +26,9 @@ router.get('/', async () => {
 
 // Autenticação
 router.post('/login', [AuthController, 'login'])
+
+// Compras (Transações)
+router.post('/purchases', [PurchaseController, 'store'])
 
 // ============================================
 // Rotas Privadas (requerem autenticação)
