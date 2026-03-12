@@ -12,6 +12,7 @@ import AuthController from '#controllers/auth_controller'
 import PurchaseController from '#controllers/purchase_controller'
 import GatewayController from '#controllers/gateway_controller'
 import UserController from '#controllers/user_controller'
+import ProductController from '#controllers/product_controller'
 import AuthMiddleware from '#middleware/auth_middleware'
 import roleMiddleware from '#middleware/role_middleware'
 import { UserRole } from '#types/user_role'
@@ -74,3 +75,14 @@ router
     router.delete('/users/:id', [UserController, 'destroy'])
   })
   .use([AuthMiddleware, roleMiddleware([UserRole.ADMIN, UserRole.MANAGER])])
+
+// Produtos (requer ADMIN, MANAGER ou FINANCE)
+router
+  .group(() => {
+    router.get('/products', [ProductController, 'index'])
+    router.get('/products/:id', [ProductController, 'show'])
+    router.post('/products', [ProductController, 'store'])
+    router.put('/products/:id', [ProductController, 'update'])
+    router.delete('/products/:id', [ProductController, 'destroy'])
+  })
+  .use([AuthMiddleware, roleMiddleware([UserRole.ADMIN, UserRole.MANAGER, UserRole.FINANCE])])
