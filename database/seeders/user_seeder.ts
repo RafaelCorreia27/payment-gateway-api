@@ -1,6 +1,7 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import User from '#models/user'
 import bcrypt from 'bcrypt'
+import { UserRole } from '#types/user_role'
 
 export default class extends BaseSeeder {
   async run() {
@@ -24,7 +25,7 @@ export default class extends BaseSeeder {
       await User.create({
         email: adminEmail,
         password: hashedPassword,
-        role: 'ADMIN',
+        role: UserRole.ADMIN,
       })
 
       console.log('✅ Usuário admin criado com sucesso!')

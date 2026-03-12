@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
+import type { UserRoleType } from '#types/user_role'
 import '#types/http_context' // Importa extensão do HttpContext
 
 /**
@@ -8,7 +9,7 @@ import '#types/http_context' // Importa extensão do HttpContext
  * 
  * Uso: router.get('/admin', [AuthMiddleware, roleMiddleware(['ADMIN', 'MANAGER'])], ...)
  */
-export default function roleMiddleware(allowedRoles: Array<'ADMIN' | 'MANAGER' | 'FINANCE' | 'USER'>) {
+export default function roleMiddleware(allowedRoles: Array<UserRoleType>) {
   return async (ctx: HttpContext, next: NextFn) => {
     const { response, authUser } = ctx
 

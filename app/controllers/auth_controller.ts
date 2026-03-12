@@ -4,6 +4,7 @@ import { loginValidator } from '#validators/login_validator'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import env from '#start/env'
+import { UserRole } from '#types/user_role'
 
 export default class AuthController {
   /**

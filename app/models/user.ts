@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
+import type { UserRoleType } from '#types/user_role'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -12,7 +13,7 @@ export default class User extends BaseModel {
   declare password: string
 
   @column()
-  declare role: 'ADMIN' | 'MANAGER' | 'FINANCE' | 'USER'
+  declare role: UserRoleType
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
