@@ -13,6 +13,7 @@ import PurchaseController from '#controllers/purchase_controller'
 import GatewayController from '#controllers/gateway_controller'
 import UserController from '#controllers/user_controller'
 import ProductController from '#controllers/product_controller'
+import ClientController from '#controllers/client_controller'
 import AuthMiddleware from '#middleware/auth_middleware'
 import roleMiddleware from '#middleware/role_middleware'
 import { UserRole } from '#types/user_role'
@@ -86,3 +87,11 @@ router
     router.delete('/products/:id', [ProductController, 'destroy'])
   })
   .use([AuthMiddleware, roleMiddleware([UserRole.ADMIN, UserRole.MANAGER, UserRole.FINANCE])])
+
+// Clientes (requer autenticação - qualquer role)
+router
+  .group(() => {
+    router.get('/clients', [ClientController, 'index'])
+    router.get('/clients/:id', [ClientController, 'show'])
+  })
+  .use([AuthMiddleware])
