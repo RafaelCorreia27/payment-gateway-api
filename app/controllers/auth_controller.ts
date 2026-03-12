@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import env from '#start/env'
 import { UserRole } from '#types/user_role'
+import { ApiResponse } from '#services/api_response'
 
 export default class AuthController {
   /**
@@ -21,18 +22,18 @@ export default class AuthController {
 
       // Verifica se o usuário existe
       if (!user) {
-        return response.unauthorized({
-          message: 'Invalid credentials',
-        })
+        return response.unauthorized(
+          ApiResponse.error('Invalid credentials', null, 'INVALID_CREDENTIALS')
+        )
       }
 
       // Verifica se a senha está correta
       const isPasswordValid = await bcrypt.compare(password, user.password)
 
       if (!isPasswordValid) {
-        return response.unauthorized({
-          message: 'Invalid credentials',
-        })
+        return response.unauthorized(
+          ApiResponse.error('Invalid credentials', null, 'INVALID_CREDENTIALS')
+        )
       }
 
       // Gera o token JWT
@@ -49,28 +50,31 @@ export default class AuthController {
       )
 
       // Retorna o token e informações do usuário (sem senha)
-      return response.ok({
-        message: 'Login successful',
-        token,
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-        },
-      })
+      return response.ok(
+        ApiResponse.success(
+          {
+            token,
+            user: {
+              id: user.id,
+              email: user.email,
+              role: user.role,
+            },
+          },
+          'Login successful'
+        )
+      )
     } catch (error) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
-        return response.unprocessableEntity({
-          message: 'Validation failed',
-          errors: error.messages,
-        })
+        return response.unprocessableEntity(
+          ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')
+        )
       }
 
       // Outros erros
-      return response.internalServerError({
-        message: 'An error occurred during login',
-      })
+      return response.internalServerError(
+        ApiResponse.error('An error occurred during login', null, 'LOGIN_ERROR')
+      )
     }
   }
 }

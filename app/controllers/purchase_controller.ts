@@ -5,6 +5,7 @@ import Transaction from '#models/transaction'
 import Gateway from '#models/gateway'
 import { createPurchaseValidator } from '#validators/create_purchase_validator'
 import { GatewayOrchestrator } from '#services/gateway_orchestrator'
+import { ApiResponse } from '#services/api_response'
 
 /**
  * Controller responsável por processar compras (transações)
@@ -39,9 +40,7 @@ export default class PurchaseController {
       const product = await Product.find(data.productId)
 
       if (!product) {
-        return response.notFound({
-          message: 'Product not found',
-        })
+        return response.notFound(ApiResponse.error('Product not found', null, 'NOT_FOUND'))
       }
 
       // 3. Calcula valor total (produto.amount × quantity)
@@ -108,45 +107,53 @@ export default class PurchaseController {
 
       // Retorna resposta baseada no resultado do pagamento
       if (paymentResult.success) {
-        return response.created({
-          message: 'Purchase processed successfully',
-          transaction: {
-            id: transaction.id,
-            status: transaction.status,
-            amount: transaction.amount,
-            gateway: paymentResult.gatewayName,
-            externalId: transaction.externalId,
-            createdAt: transaction.createdAt,
-          },
-        })
+        return response.created(
+          ApiResponse.success(
+            {
+              transaction: {
+                id: transaction.id,
+                status: transaction.status,
+                amount: transaction.amount,
+                gateway: paymentResult.gatewayName,
+                externalId: transaction.externalId,
+                createdAt: transaction.createdAt,
+              },
+            },
+            'Purchase processed successfully'
+          )
+        )
       } else {
         // Pagamento falhou em todos os gateways
-        return response.unprocessableEntity({
-          message: 'Payment processing failed',
-          error: paymentResult.error,
-          transaction: {
-            id: transaction.id,
-            status: transaction.status,
-            amount: transaction.amount,
-            createdAt: transaction.createdAt,
-          },
-          attempts: paymentResult.attempts,
-        })
+        return response.unprocessableEntity(
+          ApiResponse.error('Payment processing failed', {
+            error: paymentResult.error,
+            transaction: {
+              id: transaction.id,
+              status: transaction.status,
+              amount: transaction.amount,
+              createdAt: transaction.createdAt,
+            },
+            attempts: paymentResult.attempts,
+          }, 'PAYMENT_FAILED')
+        )
       }
     } catch (error) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
-        return response.unprocessableEntity({
-          message: 'Validation failed',
-          errors: error.messages,
-        })
+        return response.unprocessableEntity(
+          ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')
+        )
       }
 
       // Outros erros
       console.error('[PurchaseController] Error:', error)
-      return response.internalServerError({
-        message: 'An error occurred while processing the purchase',
-      })
+      return response.internalServerError(
+        ApiResponse.error(
+          'An error occurred while processing the purchase',
+          null,
+          'PURCHASE_ERROR'
+        )
+      )
     }
   }
 }
