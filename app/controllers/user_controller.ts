@@ -5,6 +5,7 @@ import { updateUserValidator } from '#validators/update_user_validator'
 import bcrypt from 'bcrypt'
 import { ApiResponse } from '#services/api_response'
 import type { UserRoleType } from '#types/user_role'
+import logger from '@adonisjs/core/services/logger'
 
 /**
  * Controller responsável por gerenciar usuários (CRUD)
@@ -44,7 +45,7 @@ export default class UserController {
         )
       )
     } catch (error) {
-      console.error('[UserController] Error in index:', error)
+      logger.error({ err: error }, '[UserController] Error in index')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while retrieving users',
@@ -84,7 +85,7 @@ export default class UserController {
         )
       )
     } catch (error) {
-      console.error('[UserController] Error in show:', error)
+      logger.error({ err: error }, '[UserController] Error in show')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while retrieving user',
@@ -146,7 +147,7 @@ export default class UserController {
         )
       }
 
-      console.error('[UserController] Error in store:', error)
+      logger.error({ err: error }, '[UserController] Error in store')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while creating user',
@@ -220,7 +221,7 @@ export default class UserController {
         )
       }
 
-      console.error('[UserController] Error in update:', error)
+      logger.error({ err: error }, '[UserController] Error in update')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while updating user',
@@ -249,7 +250,7 @@ export default class UserController {
 
       return response.ok(ApiResponse.success(null, 'User deleted successfully'))
     } catch (error) {
-      console.error('[UserController] Error in destroy:', error)
+      logger.error({ err: error }, '[UserController] Error in destroy')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while deleting user',

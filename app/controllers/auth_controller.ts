@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken'
 import env from '#start/env'
 import { UserRole } from '#types/user_role'
 import { ApiResponse } from '#services/api_response'
+import logger from '@adonisjs/core/services/logger'
 
 export default class AuthController {
   /**
@@ -74,6 +75,7 @@ export default class AuthController {
       }
 
       // Outros erros
+      logger.error({ err: error }, '[AuthController] Error during login')
       return response.internalServerError(
         ApiResponse.error('An error occurred during login', null, 'LOGIN_ERROR')
       )

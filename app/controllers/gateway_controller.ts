@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Gateway from '#models/gateway'
 import { updateGatewayValidator } from '#validators/update_gateway_validator'
 import { ApiResponse } from '#services/api_response'
+import logger from '@adonisjs/core/services/logger'
 
 /**
  * Controller responsável por gerenciar gateways
@@ -46,7 +47,7 @@ export default class GatewayController {
         )
       )
     } catch (error) {
-      console.error('[GatewayController] Error in toggle:', error)
+      logger.error({ err: error }, '[GatewayController] Error in toggle')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while toggling gateway status',
@@ -106,7 +107,7 @@ export default class GatewayController {
         )
       }
 
-      console.error('[GatewayController] Error in updatePriority:', error)
+      logger.error({ err: error }, '[GatewayController] Error in updatePriority')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while updating gateway priority',
@@ -167,7 +168,7 @@ export default class GatewayController {
         )
       }
 
-      console.error('[GatewayController] Error in update:', error)
+      logger.error({ err: error }, '[GatewayController] Error in update')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while updating gateway',

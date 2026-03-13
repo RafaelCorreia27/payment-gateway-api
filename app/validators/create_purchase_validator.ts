@@ -23,6 +23,7 @@ export const createPurchaseValidator = vine.compile(
     quantity: vine
       .number()
       .min(1)
+      .max(1000)
       .withoutDecimals(),
 
     name: vine
@@ -40,7 +41,7 @@ export const createPurchaseValidator = vine.compile(
     cardNumber: vine
       .string()
       .trim()
-      .regex(/^\d{16}$/),
+      .regex(/^\d{13,19}$/),
 
     cvv: vine
       .string()

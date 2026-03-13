@@ -6,6 +6,7 @@ import Gateway from '#models/gateway'
 import { createPurchaseValidator } from '#validators/create_purchase_validator'
 import { GatewayOrchestrator } from '#services/gateway_orchestrator'
 import { ApiResponse } from '#services/api_response'
+import logger from '@adonisjs/core/services/logger'
 
 /**
  * Controller responsável por processar compras (transações)
@@ -146,7 +147,7 @@ export default class PurchaseController {
       }
 
       // Outros erros
-      console.error('[PurchaseController] Error:', error)
+      logger.error({ err: error }, '[PurchaseController] Error')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while processing the purchase',

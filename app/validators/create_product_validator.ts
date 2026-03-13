@@ -18,6 +18,7 @@ export const createProductValidator = vine.compile(
     amount: vine
       .number()
       .min(1)
+      .max(999999999)
       .withoutDecimals(),
   })
 )

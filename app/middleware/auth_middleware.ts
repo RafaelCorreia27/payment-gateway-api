@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import env from '#start/env'
 import type { JwtPayload } from '#types/jwt'
 import User from '#models/user'
+import { ApiResponse } from '#services/api_response'
 import '#types/http_context' // Importa extensão do HttpContext
 
 /**
@@ -18,9 +19,9 @@ export default class AuthMiddleware {
     const authHeader = request.header('authorization')
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return response.unauthorized({
-        message: 'Authentication required. Please provide a valid token.',
-      })
+      return response.unauthorized(
+        ApiResponse.error('Authentication required. Please provide a valid token.', null, 'UNAUTHORIZED')
+      )
     }
 
     // Remove "Bearer " e pega apenas o token
@@ -34,9 +35,9 @@ export default class AuthMiddleware {
       const user = await User.find(decoded.userId)
 
       if (!user) {
-        return response.unauthorized({
-          message: 'User not found',
-        })
+        return response.unauthorized(
+          ApiResponse.error('User not found', null, 'USER_NOT_FOUND')
+        )
       }
 
       // Adiciona o usuário e o payload do token ao contexto
@@ -49,21 +50,21 @@ export default class AuthMiddleware {
     } catch (error) {
       // Token inválido, expirado ou malformado
       if (error instanceof jwt.JsonWebTokenError) {
-        return response.unauthorized({
-          message: 'Invalid token',
-        })
+        return response.unauthorized(
+          ApiResponse.error('Invalid token', null, 'INVALID_TOKEN')
+        )
       }
 
       if (error instanceof jwt.TokenExpiredError) {
-        return response.unauthorized({
-          message: 'Token expired',
-        })
+        return response.unauthorized(
+          ApiResponse.error('Token expired', null, 'TOKEN_EXPIRED')
+        )
       }
 
       // Outros erros
-      return response.unauthorized({
-        message: 'Authentication failed',
-      })
+      return response.unauthorized(
+        ApiResponse.error('Authentication failed', null, 'AUTHENTICATION_FAILED')
+      )
     }
   }
 }
