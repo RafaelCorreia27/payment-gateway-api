@@ -1,9 +1,10 @@
+node_modules
 build
 dist
 tmp
 .vscode
-TESTE_BETALENT.md
 TESTE-1.md
 TESTE-2.md
 VULNERABILITIES.md
-node_modules
+TESTE_BETALENT.md
+INSTRUCOES_MYSQL.md

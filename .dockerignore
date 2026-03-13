@@ -1,0 +1,43 @@
+# Dependências
+node_modules
+npm-debug.log
+
+# Build
+build
+dist
+tmp
+
+# Arquivos de desenvolvimento
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Git
+.git
+.gitignore
+
+# Documentação de teste
+TESTE_BETALENT.md
+TESTE-1.md
+TESTE-2.md
+VULNERABILITIES.md
+INSTRUCOES_MYSQL.md
+
+# Variáveis de ambiente (serão passadas via docker-compose)
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs
+*.log
+
+# Testes
+coverage
+.nyc_output
+
+# Outros
+.DS_Store
+Thumbs.db
