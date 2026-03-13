@@ -16,6 +16,7 @@ export const updateGatewayValidator = vine.compile(
     priority: vine
       .number()
       .min(1)
+      .max(1000)
       .withoutDecimals()
       .optional(),
   })

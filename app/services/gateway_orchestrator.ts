@@ -8,6 +8,7 @@ import type {
 import Gateway from '#models/gateway'
 import { Gateway1Service } from './gateway1_service.js'
 import { Gateway2Service } from './gateway2_service.js'
+import logger from '@adonisjs/core/services/logger'
 
 /**
  * Interface para resultado da orquestração
@@ -69,7 +70,7 @@ export class GatewayOrchestrator {
   private getGatewayService(gatewayName: string): IGateway | null {
     const serviceFactory = this.gatewayServices.get(gatewayName)
     if (!serviceFactory) {
-      console.warn(`[GatewayOrchestrator] Gateway service not found: ${gatewayName}`)
+      logger.warn(`[GatewayOrchestrator] Gateway service not found: ${gatewayName}`)
       return null
     }
     return serviceFactory()
@@ -141,7 +142,7 @@ export class GatewayOrchestrator {
         }
 
         // Se falhou, continua para próximo gateway
-        console.log(
+        logger.info(
           `[GatewayOrchestrator] Gateway ${gateway.name} failed: ${result.error}. Trying next gateway...`
         )
       } catch (error) {
@@ -152,7 +153,7 @@ export class GatewayOrchestrator {
           success: false,
           error: errorMessage,
         })
-        console.error(`[GatewayOrchestrator] Error processing with ${gateway.name}:`, error)
+        logger.error({ err: error, gatewayName: gateway.name }, `[GatewayOrchestrator] Error processing with ${gateway.name}`)
       }
     }
 

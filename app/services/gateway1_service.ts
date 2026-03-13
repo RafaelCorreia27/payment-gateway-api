@@ -8,6 +8,7 @@ import type {
 } from '#types/gateway'
 import env from '#start/env'
 import axios, { AxiosError } from 'axios'
+import logger from '@adonisjs/core/services/logger'
 
 /**
  * Interface para resposta de login do Gateway 1
@@ -97,7 +98,7 @@ export class Gateway1Service extends BaseGateway {
 
       return false
     } catch (error) {
-      console.error(`[Gateway1Service] Authentication failed:`, error)
+      logger.error({ err: error }, '[Gateway1Service] Authentication failed')
       return false
     }
   }

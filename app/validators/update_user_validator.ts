@@ -22,8 +22,9 @@ export const updateUserValidator = vine.compile(
 
     password: vine
       .string()
-      .minLength(6)
+      .minLength(8)
       .maxLength(255)
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
       .optional(),
 
     role: vine

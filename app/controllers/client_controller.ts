@@ -5,6 +5,7 @@ import Product from '#models/product'
 import { ApiResponse } from '#services/api_response'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import type { ManyToManyQueryBuilderContract } from '@adonisjs/lucid/types/relations'
+import logger from '@adonisjs/core/services/logger'
 
 /**
  * Controller responsável por visualizar clientes
@@ -41,7 +42,7 @@ export default class ClientController {
         )
       )
     } catch (error) {
-      console.error('[ClientController] Error in index:', error)
+      logger.error({ err: error }, '[ClientController] Error in index')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while retrieving clients',
@@ -115,7 +116,7 @@ export default class ClientController {
         )
       )
     } catch (error) {
-      console.error('[ClientController] Error in show:', error)
+      logger.error({ err: error }, '[ClientController] Error in show')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while retrieving client',

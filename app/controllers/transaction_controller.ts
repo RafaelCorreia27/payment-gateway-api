@@ -3,6 +3,7 @@ import Transaction from '#models/transaction'
 import { refundTransactionValidator } from '#validators/refund_transaction_validator'
 import { GatewayOrchestrator } from '#services/gateway_orchestrator'
 import { ApiResponse } from '#services/api_response'
+import logger from '@adonisjs/core/services/logger'
 
 /**
  * Controller responsável por visualizar e gerenciar transações
@@ -59,7 +60,7 @@ export default class TransactionController {
         )
       )
     } catch (error) {
-      console.error('[TransactionController] Error in index:', error)
+      logger.error({ err: error }, '[TransactionController] Error in index')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while retrieving transactions',
@@ -127,7 +128,7 @@ export default class TransactionController {
         )
       )
     } catch (error) {
-      console.error('[TransactionController] Error in show:', error)
+      logger.error({ err: error }, '[TransactionController] Error in show')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while retrieving transaction',
@@ -182,7 +183,7 @@ export default class TransactionController {
       }
 
       // Verifica se transação tem gateway (necessário para reembolso)
-      if (!transaction.gatewayId || !transaction.externalId) {
+      if (!transaction.gatewayId || !transaction.externalId || !transaction.gateway) {
         return response.unprocessableEntity(
           ApiResponse.error(
             'Transaction does not have gateway information for refund',
@@ -231,7 +232,7 @@ export default class TransactionController {
         )
       }
     } catch (error) {
-      console.error('[TransactionController] Error in refund:', error)
+      logger.error({ err: error }, '[TransactionController] Error in refund')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while processing refund',

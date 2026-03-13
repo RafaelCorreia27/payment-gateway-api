@@ -19,8 +19,9 @@ export const createUserValidator = vine.compile(
 
     password: vine
       .string()
-      .minLength(6)
-      .maxLength(255),
+      .minLength(8)
+      .maxLength(255)
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/),
 
     role: vine
       .enum(Object.values(UserRole) as [string, ...string[]])

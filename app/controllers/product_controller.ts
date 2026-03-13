@@ -3,6 +3,7 @@ import Product from '#models/product'
 import { createProductValidator } from '#validators/create_product_validator'
 import { updateProductValidator } from '#validators/update_product_validator'
 import { ApiResponse } from '#services/api_response'
+import logger from '@adonisjs/core/services/logger'
 
 /**
  * Controller responsável por gerenciar produtos (CRUD)
@@ -42,7 +43,7 @@ export default class ProductController {
         )
       )
     } catch (error) {
-      console.error('[ProductController] Error in index:', error)
+      logger.error({ err: error }, '[ProductController] Error in index')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while retrieving products',
@@ -82,7 +83,7 @@ export default class ProductController {
         )
       )
     } catch (error) {
-      console.error('[ProductController] Error in show:', error)
+      logger.error({ err: error }, '[ProductController] Error in show')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while retrieving product',
@@ -131,7 +132,7 @@ export default class ProductController {
         )
       }
 
-      console.error('[ProductController] Error in store:', error)
+      logger.error({ err: error }, '[ProductController] Error in store')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while creating product',
@@ -192,7 +193,7 @@ export default class ProductController {
         )
       }
 
-      console.error('[ProductController] Error in update:', error)
+      logger.error({ err: error }, '[ProductController] Error in update')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while updating product',
@@ -222,7 +223,7 @@ export default class ProductController {
 
       return response.ok(ApiResponse.success(null, 'Product deleted successfully'))
     } catch (error) {
-      console.error('[ProductController] Error in destroy:', error)
+      logger.error({ err: error }, '[ProductController] Error in destroy')
       return response.internalServerError(
         ApiResponse.error(
           'An error occurred while deleting product',
