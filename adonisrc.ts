@@ -36,4 +36,13 @@ export default {
     migrations: './database/migrations',
     seeders: './database/seeders',
   },
+
+  /*
+  |--------------------------------------------------------------------------
+  | Providers
+  |--------------------------------------------------------------------------
+  */
+  providers: [
+    () => import('@adonisjs/lucid/database'),
+  ],
 }
