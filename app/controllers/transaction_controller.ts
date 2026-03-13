@@ -183,7 +183,7 @@ export default class TransactionController {
       }
 
       // Verifica se transação tem gateway (necessário para reembolso)
-      if (!transaction.gatewayId || !transaction.externalId) {
+      if (!transaction.gatewayId || !transaction.externalId || !transaction.gateway) {
         return response.unprocessableEntity(
           ApiResponse.error(
             'Transaction does not have gateway information for refund',

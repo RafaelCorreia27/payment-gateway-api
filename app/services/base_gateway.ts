@@ -126,14 +126,17 @@ export abstract class BaseGateway implements IGateway {
       return false
     }
 
-    if (!data.cvv || data.cvv.length < 3) {
+    // Valida CVV (3-4 dígitos)
+    if (!data.cvv || !/^\d{3,4}$/.test(data.cvv)) {
       return false
     }
 
+    // Valida email básico
     if (!data.email || !data.email.includes('@')) {
       return false
     }
 
+    // Valida nome (não vazio)
     if (!data.name || data.name.trim().length === 0) {
       return false
     }
