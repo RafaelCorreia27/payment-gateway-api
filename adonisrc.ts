@@ -1,6 +1,14 @@
-import { defineConfig } from '@adonisjs/core/app'
+/*
+|--------------------------------------------------------------------------
+| AdonisJS RC File
+|--------------------------------------------------------------------------
+|
+| This file is used to configure the AdonisJS application.
+| In AdonisJS v6, this file uses a simple object structure.
+|
+*/
 
-export default defineConfig({
+export default {
   /*
   |--------------------------------------------------------------------------
   | App key
@@ -28,4 +36,4 @@ export default defineConfig({
     migrations: './database/migrations',
     seeders: './database/seeders',
   },
-})
+}

@@ -1,4 +1,4 @@
-import vine from '@adonisjs/vinejs'
+import vine from '@vinejs/vine'
 
 /**
  * Validator para validação de dados de login

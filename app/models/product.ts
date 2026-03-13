@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, manyToMany } from '@adonisjs/lucid/orm'
+import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import Transaction from './transaction.js'
 import TransactionProduct from './transaction_product.js'
 
@@ -29,5 +30,5 @@ export default class Product extends BaseModel {
     pivotRelatedForeignKey: 'transaction_id',
     pivotColumns: ['quantity'],
   })
-  declare transactions: ReturnType<typeof Transaction.manyToMany>
+  declare transactions: ManyToMany<typeof Transaction>
 }

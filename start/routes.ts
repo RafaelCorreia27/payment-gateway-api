@@ -15,7 +15,6 @@ import UserController from '#controllers/user_controller'
 import ProductController from '#controllers/product_controller'
 import ClientController from '#controllers/client_controller'
 import TransactionController from '#controllers/transaction_controller'
-import AuthMiddleware from '#middleware/auth_middleware'
 import roleMiddleware from '#middleware/role_middleware'
 import { UserRole } from '#types/user_role'
 
@@ -41,22 +40,27 @@ router.post('/purchases', [PurchaseController, 'store'])
 // ============================================
 
 // Exemplo de rota protegida (requer autenticação)
-router.get('/me', [AuthMiddleware], async ({ authUser, response }) => {
-  return response.ok({
-    user: {
-      id: authUser!.id,
-      email: authUser!.email,
-      role: authUser!.role,
-    },
+router
+  .get('/me', async (ctx) => {
+    return ctx.response.ok({
+      user: {
+        id: ctx.authUser!.id,
+        email: ctx.authUser!.email,
+        role: ctx.authUser!.role,
+      },
+    })
   })
-})
+  .use(() => import('#middleware/auth_middleware'))
 
 // Exemplo de rota protegida com role específica (requer ADMIN ou MANAGER)
-router.get('/admin-only', [AuthMiddleware, roleMiddleware([UserRole.ADMIN, UserRole.MANAGER])], async ({ response }) => {
-  return response.ok({
-    message: 'This route is only accessible to ADMIN or MANAGER users',
+router
+  .get('/admin-only', async (ctx) => {
+    return ctx.response.ok({
+      message: 'This route is only accessible to ADMIN or MANAGER users',
+    })
   })
-})
+  .use(() => import('#middleware/auth_middleware'))
+  .use(roleMiddleware([UserRole.ADMIN, UserRole.MANAGER]))
 
 // Gateways (requer ADMIN ou MANAGER)
 router
@@ -65,7 +69,8 @@ router
     router.patch('/gateways/:id/priority', [GatewayController, 'updatePriority'])
     router.patch('/gateways/:id', [GatewayController, 'update'])
   })
-  .use([AuthMiddleware, roleMiddleware([UserRole.ADMIN, UserRole.MANAGER])])
+  .use(() => import('#middleware/auth_middleware'))
+  .use(roleMiddleware([UserRole.ADMIN, UserRole.MANAGER]))
 
 // Usuários (requer ADMIN ou MANAGER)
 router
@@ -76,7 +81,8 @@ router
     router.put('/users/:id', [UserController, 'update'])
     router.delete('/users/:id', [UserController, 'destroy'])
   })
-  .use([AuthMiddleware, roleMiddleware([UserRole.ADMIN, UserRole.MANAGER])])
+  .use(() => import('#middleware/auth_middleware'))
+  .use(roleMiddleware([UserRole.ADMIN, UserRole.MANAGER]))
 
 // Produtos (requer ADMIN, MANAGER ou FINANCE)
 router
@@ -87,7 +93,8 @@ router
     router.put('/products/:id', [ProductController, 'update'])
     router.delete('/products/:id', [ProductController, 'destroy'])
   })
-  .use([AuthMiddleware, roleMiddleware([UserRole.ADMIN, UserRole.MANAGER, UserRole.FINANCE])])
+  .use(() => import('#middleware/auth_middleware'))
+  .use(roleMiddleware([UserRole.ADMIN, UserRole.MANAGER, UserRole.FINANCE]))
 
 // Clientes (requer autenticação - qualquer role)
 router
@@ -95,7 +102,7 @@ router
     router.get('/clients', [ClientController, 'index'])
     router.get('/clients/:id', [ClientController, 'show'])
   })
-  .use([AuthMiddleware])
+  .use(() => import('#middleware/auth_middleware'))
 
 // Transações (requer autenticação - qualquer role para visualizar)
 router
@@ -103,12 +110,10 @@ router
     router.get('/transactions', [TransactionController, 'index'])
     router.get('/transactions/:id', [TransactionController, 'show'])
   })
-  .use([AuthMiddleware])
+  .use(() => import('#middleware/auth_middleware'))
 
 // Reembolso de transações (requer ADMIN ou FINANCE)
-router.post('/transactions/:id/refund', [
-  AuthMiddleware,
-  roleMiddleware([UserRole.ADMIN, UserRole.FINANCE]),
-  TransactionController,
-  'refund',
-])
+router
+  .post('/transactions/:id/refund', [TransactionController, 'refund'])
+  .use(() => import('#middleware/auth_middleware'))
+  .use(roleMiddleware([UserRole.ADMIN, UserRole.FINANCE]))

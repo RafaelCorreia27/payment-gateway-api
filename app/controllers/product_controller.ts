@@ -102,7 +102,7 @@ export default class ProductController {
   async store({ request, response }: HttpContext) {
     try {
       // Valida dados de entrada
-      const data = await request.validateUsing(createProductValidator)
+      const data = await createProductValidator.validate(request.all())
 
       // Cria produto
       const product = await Product.create({
@@ -123,7 +123,7 @@ export default class ProductController {
           'Product created successfully'
         )
       )
-    } catch (error) {
+    } catch (error: any) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(
@@ -158,7 +158,7 @@ export default class ProductController {
       }
 
       // Valida dados de entrada
-      const data = await request.validateUsing(updateProductValidator)
+      const data = await updateProductValidator.validate(request.all())
 
       // Atualiza apenas os campos enviados
       if (data.name !== undefined) {
@@ -184,7 +184,7 @@ export default class ProductController {
           'Product updated successfully'
         )
       )
-    } catch (error) {
+    } catch (error: any) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(

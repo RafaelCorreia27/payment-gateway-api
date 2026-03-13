@@ -1,4 +1,4 @@
-import vine from '@adonisjs/vinejs'
+import vine from '@vinejs/vine'
 
 /**
  * Validator para validação de dados de compra
@@ -17,34 +17,34 @@ export const createPurchaseValidator = vine.compile(
   vine.object({
     productId: vine
       .number()
-      .min(1, 'Product ID must be greater than 0')
+      .min(1)
       .withoutDecimals(),
 
     quantity: vine
       .number()
-      .min(1, 'Quantity must be at least 1')
+      .min(1)
       .withoutDecimals(),
 
     name: vine
       .string()
       .trim()
-      .minLength(2, 'Name must be at least 2 characters')
-      .maxLength(255, 'Name must not exceed 255 characters'),
+      .minLength(2)
+      .maxLength(255),
 
     email: vine
       .string()
-      .email('Invalid email format')
+      .email()
       .trim()
       .normalizeEmail(),
 
     cardNumber: vine
       .string()
       .trim()
-      .regex(/^\d{16}$/, 'Card number must be exactly 16 digits'),
+      .regex(/^\d{16}$/),
 
     cvv: vine
       .string()
       .trim()
-      .regex(/^\d{3,4}$/, 'CVV must be 3 or 4 digits'),
+      .regex(/^\d{3,4}$/),
   })
 )

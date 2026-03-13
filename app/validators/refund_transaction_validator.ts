@@ -1,4 +1,4 @@
-import vine from '@adonisjs/vinejs'
+import vine from '@vinejs/vine'
 
 /**
  * Validator para validação de dados de reembolso de transação
@@ -10,7 +10,7 @@ export const refundTransactionValidator = vine.compile(
   vine.object({
     transactionId: vine
       .number()
-      .min(1, 'Transaction ID must be greater than 0')
+      .min(1)
       .withoutDecimals(),
   })
 )

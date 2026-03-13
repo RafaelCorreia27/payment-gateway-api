@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 import Transaction from './transaction.js'
 
 export default class Gateway extends BaseModel {
@@ -25,5 +26,5 @@ export default class Gateway extends BaseModel {
    * Relacionamento: Um gateway tem muitas transações
    */
   @hasMany(() => Transaction)
-  declare transactions: ReturnType<typeof Transaction.hasMany>
+  declare transactions: HasMany<typeof Transaction>
 }

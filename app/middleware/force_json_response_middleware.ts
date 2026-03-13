@@ -7,7 +7,7 @@ import type { NextFn } from '@adonisjs/core/types/http'
  */
 export default class ForceJsonResponseMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
-    ctx.request.updateAcceptHeader('application/json')
+    ctx.request.headers()['accept'] = 'application/json'
 
     return next()
   }

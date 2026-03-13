@@ -4,6 +4,7 @@ import { createUserValidator } from '#validators/create_user_validator'
 import { updateUserValidator } from '#validators/update_user_validator'
 import bcrypt from 'bcrypt'
 import { ApiResponse } from '#services/api_response'
+import type { UserRoleType } from '#types/user_role'
 
 /**
  * Controller responsável por gerenciar usuários (CRUD)
@@ -104,7 +105,7 @@ export default class UserController {
   async store({ request, response }: HttpContext) {
     try {
       // Valida dados de entrada
-      const data = await request.validateUsing(createUserValidator)
+      const data = await createUserValidator.validate(request.all())
 
       // Verifica se email já existe (validação adicional)
       const existingUser = await User.findBy('email', data.email)
@@ -121,7 +122,7 @@ export default class UserController {
       const user = await User.create({
         email: data.email,
         password: hashedPassword,
-        role: data.role || 'USER', // Padrão: USER
+        role: (data.role || 'USER') as UserRoleType, // Padrão: USER
       })
 
       return response.created(
@@ -137,7 +138,7 @@ export default class UserController {
           'User created successfully'
         )
       )
-    } catch (error) {
+    } catch (error: any) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(
@@ -173,7 +174,7 @@ export default class UserController {
       }
 
       // Valida dados de entrada
-      const data = await request.validateUsing(updateUserValidator)
+      const data = await updateUserValidator.validate(request.all())
 
       // Verifica se email já existe para outro usuário (validação adicional)
       if (data.email && data.email !== user.email) {
@@ -193,7 +194,7 @@ export default class UserController {
 
       // Atualiza role se fornecido
       if (data.role !== undefined) {
-        user.role = data.role
+        user.role = data.role as UserRoleType
       }
 
       await user.save()
@@ -211,7 +212,7 @@ export default class UserController {
           'User updated successfully'
         )
       )
-    } catch (error) {
+    } catch (error: any) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(

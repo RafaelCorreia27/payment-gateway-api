@@ -1,6 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Client from '#models/client'
+import Transaction from '#models/transaction'
+import Product from '#models/product'
 import { ApiResponse } from '#services/api_response'
+import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+import type { ManyToManyQueryBuilderContract } from '@adonisjs/lucid/types/relations'
 
 /**
  * Controller responsável por visualizar clientes
@@ -63,17 +67,17 @@ export default class ClientController {
       }
 
       // Carrega transações do cliente com relacionamentos
-      await client.load('transactions', (transactionsQuery) => {
+      await client.load('transactions', (transactionsQuery: ModelQueryBuilderContract<typeof Transaction>) => {
         transactionsQuery
           .preload('gateway')
-          .preload('products', (productsQuery) => {
+          .preload('products', (productsQuery: ManyToManyQueryBuilderContract<typeof Product, Product>) => {
             productsQuery.pivotColumns(['quantity'])
           })
           .orderBy('createdAt', 'desc')
       })
 
       // Formata transações para resposta
-      const transactions = client.transactions.map((transaction) => ({
+      const transactions = client.transactions.map((transaction: Transaction) => ({
         id: transaction.id,
         status: transaction.status,
         amount: transaction.amount,
@@ -85,7 +89,7 @@ export default class ClientController {
             }
           : null,
         externalId: transaction.externalId,
-        products: transaction.products.map((product) => ({
+        products: transaction.products.map((product: Product) => ({
           id: product.id,
           name: product.name,
           amount: product.amount,
