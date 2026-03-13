@@ -26,6 +26,9 @@ FROM node:20-alpine AS production
 # Instalar apenas dependências de produção
 WORKDIR /app
 
+# Instalar wget para healthcheck (como root)
+RUN apk add --no-cache wget
+
 # Copiar package.json e package-lock.json
 COPY package.json package-lock.json ./
 

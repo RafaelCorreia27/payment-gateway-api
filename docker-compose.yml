@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # MySQL Database
+  # ============================================
+  mysql:
+    image: mysql:8.0
+    container_name: payment-gateway-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: payment_gateway
+      MYSQL_USER: payment_user
+      MYSQL_PASSWORD: payment_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - payment-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  # ============================================
+  # Mock Gateways (Gateway 1 e Gateway 2)
+  # ============================================
+  gateways-mock:
+    image: matheusprotzen/gateways-mock:latest
+    container_name: payment-gateway-mocks
+    restart: unless-stopped
+    ports:
+      - "3001:3001"  # Gateway 1
+      - "3002:3002"  # Gateway 2
+    networks:
+      - payment-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/login"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # Payment Gateway API Application
+  # ============================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payment-gateway-api
+    restart: unless-stopped
+    ports:
+      - "3333:3333"
+    environment:
+      # Application
+      PORT: 3333
+      HOST: 0.0.0.0
+      NODE_ENV: production
+      APP_KEY: ${APP_KEY:-change-this-key-in-production}
+      
+      # Database
+      DB_CONNECTION: mysql
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: payment_user
+      MYSQL_PASSWORD: payment_pass
+      MYSQL_DB_NAME: payment_gateway
+      
+      # JWT
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-here-change-in-production}
+      JWT_EXPIRES_IN: 7d
+      
+      # Gateway 1 Configuration
+      GATEWAY_1_URL: http://gateways-mock:3001
+      GATEWAY_1_EMAIL: dev@betalent.tech
+      GATEWAY_1_TOKEN: FEC9BB078BF338F464F96B48089EB498
+      
+      # Gateway 2 Configuration
+      GATEWAY_2_URL: http://gateways-mock:3002
+      GATEWAY_2_AUTH_TOKEN: tk_f2198cc671b5289fa856
+      GATEWAY_2_AUTH_SECRET: 3d15e8ed6131446ea7e3456728b1211f
+    depends_on:
+      mysql:
+        condition: service_healthy
+      gateways-mock:
+        condition: service_healthy
+    networks:
+      - payment-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3333 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  payment-network:
+    driver: bridge
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  mysql_data:
+    driver: local
