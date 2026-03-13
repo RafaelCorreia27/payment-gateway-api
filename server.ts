@@ -24,20 +24,13 @@ const APP_ROOT = new URL('../', import.meta.url)
 const ignitor = new Ignitor(APP_ROOT, { importer: (url) => import(url) })
 
 /**
- * Pretty print errors
- */
-ignitor.onError((error) => {
-  console.error(prettyPrintError(error))
-  process.exit(1)
-})
-
-/**
  * Start the HTTP server
  */
-ignitor
-  .httpServer()
-  .start()
-  .catch((error) => {
-    console.error(prettyPrintError(error))
-    process.exit(1)
-  })
+try {
+  await ignitor
+    .httpServer()
+    .start()
+} catch (error) {
+  await prettyPrintError(error)
+  process.exit(1)
+}

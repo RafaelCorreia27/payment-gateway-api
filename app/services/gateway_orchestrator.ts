@@ -41,7 +41,7 @@ export class GatewayOrchestrator {
    * Mapeia nomes de gateways para suas classes de serviço
    * Facilita a criação de instâncias dinamicamente
    */
-  private readonly gatewayServices: Map<string, () => IGateway> = new Map([
+  private readonly gatewayServices: Map<string, () => IGateway> = new Map<string, () => IGateway>([
     ['Gateway 1', () => new Gateway1Service()],
     ['Gateway 2', () => new Gateway2Service()],
     // Adicionar novos gateways aqui:

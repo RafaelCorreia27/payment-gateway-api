@@ -25,17 +25,25 @@ export abstract class BaseGateway implements IGateway {
 
   /**
    * Cliente HTTP configurado para fazer requisições ao gateway
+   * Inicializado de forma lazy na primeira vez que é acessado
    */
-  protected httpClient: AxiosInstance
+  protected _httpClient: AxiosInstance | null = null
 
-  constructor() {
-    this.httpClient = axios.create({
-      baseURL: this.baseUrl,
-      timeout: 30000, // 30 segundos
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+  /**
+   * Getter que inicializa o httpClient de forma lazy
+   * Isso permite acessar baseUrl após a construção da classe filha
+   */
+  protected get httpClient(): AxiosInstance {
+    if (!this._httpClient) {
+      this._httpClient = axios.create({
+        baseURL: this.baseUrl,
+        timeout: 30000, // 30 segundos
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    }
+    return this._httpClient
   }
 
   /**

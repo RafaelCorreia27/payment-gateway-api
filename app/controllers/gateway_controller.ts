@@ -73,7 +73,7 @@ export default class GatewayController {
       }
 
       // Valida dados de entrada
-      const { priority } = await request.validateUsing(updateGatewayValidator)
+      const { priority } = await updateGatewayValidator.validate(request.all())
 
       if (priority === undefined) {
         return response.unprocessableEntity(
@@ -98,7 +98,7 @@ export default class GatewayController {
           'Gateway priority updated successfully'
         )
       )
-    } catch (error) {
+    } catch (error: any) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(
@@ -133,7 +133,7 @@ export default class GatewayController {
       }
 
       // Valida dados de entrada
-      const data = await request.validateUsing(updateGatewayValidator)
+      const data = await updateGatewayValidator.validate(request.all())
 
       // Atualiza apenas os campos enviados
       if (data.isActive !== undefined) {
@@ -159,7 +159,7 @@ export default class GatewayController {
           'Gateway updated successfully'
         )
       )
-    } catch (error) {
+    } catch (error: any) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(

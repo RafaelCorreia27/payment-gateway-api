@@ -15,7 +15,7 @@ export default class AuthController {
   async login({ request, response }: HttpContext) {
     try {
       // Valida os dados de entrada
-      const { email, password } = await request.validateUsing(loginValidator)
+      const { email, password } = await loginValidator.validate(request.all())
 
       // Busca o usuário pelo email
       const user = await User.findBy('email', email)
@@ -37,16 +37,18 @@ export default class AuthController {
       }
 
       // Gera o token JWT
+      const jwtSecret = String(env.get('JWT_SECRET'))
+      const jwtExpiresIn = String(env.get('JWT_EXPIRES_IN'))
       const token = jwt.sign(
         {
           userId: user.id,
           email: user.email,
           role: user.role,
         },
-        env.get('JWT_SECRET'),
+        jwtSecret,
         {
-          expiresIn: env.get('JWT_EXPIRES_IN'),
-        }
+          expiresIn: jwtExpiresIn,
+        } as jwt.SignOptions
       )
 
       // Retorna o token e informações do usuário (sem senha)
@@ -63,7 +65,7 @@ export default class AuthController {
           'Login successful'
         )
       )
-    } catch (error) {
+    } catch (error: any) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(

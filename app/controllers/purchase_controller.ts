@@ -34,7 +34,7 @@ export default class PurchaseController {
   async store({ request, response }: HttpContext) {
     try {
       // 1. Valida dados de entrada
-      const data = await request.validateUsing(createPurchaseValidator)
+      const data = await createPurchaseValidator.validate(request.all())
 
       // 2. Busca produto pelo ID
       const product = await Product.find(data.productId)
@@ -137,7 +137,7 @@ export default class PurchaseController {
           }, 'PAYMENT_FAILED')
         )
       }
-    } catch (error) {
+    } catch (error: any) {
       // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(

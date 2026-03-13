@@ -1,4 +1,4 @@
-import vine from '@adonisjs/vinejs'
+import vine from '@vinejs/vine'
 import { UserRole } from '#types/user_role'
 
 /**
@@ -15,15 +15,15 @@ export const updateUserValidator = vine.compile(
   vine.object({
     email: vine
       .string()
-      .email('Invalid email format')
+      .email()
       .trim()
       .normalizeEmail()
       .optional(),
 
     password: vine
       .string()
-      .minLength(6, 'Password must be at least 6 characters')
-      .maxLength(255, 'Password must not exceed 255 characters')
+      .minLength(6)
+      .maxLength(255)
       .optional(),
 
     role: vine

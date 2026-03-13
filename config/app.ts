@@ -1,20 +1,8 @@
-import { defineConfig } from '@adonisjs/core/app'
+/**
+ * Configurações da aplicação
+ * 
+ * Nota: No AdonisJS v6, as configurações principais (appKey, http, directories)
+ * estão no arquivo adonisrc.ts na raiz do projeto.
+ */
 
-export default defineConfig({
-  /*
-  |--------------------------------------------------------------------------
-  | App key
-  |--------------------------------------------------------------------------
-  |
-  | The appKey is used for encrypting cookies, generating signed URLs,
-  | and by the "encryption" module.
-  |
-  */
-  appKey: process.env.APP_KEY || '',
-
-  http: {
-    allowMethodSpoofing: false,
-    trustProxy: false,
-    forceContentNegotiationTo: 'application/json',
-  },
-})
+export default {}

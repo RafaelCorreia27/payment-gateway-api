@@ -21,14 +21,11 @@ const APP_ROOT = new URL('../', import.meta.url)
 const ignitor = new Ignitor(APP_ROOT, { importer: (url) => import(url) })
 
 /**
- * Pretty print errors
- */
-ignitor.onError((error) => {
-  console.error(prettyPrintError(error))
-  process.exit(1)
-})
-
-/**
  * Execute ace command
  */
-await ignitor.exec()
+try {
+  await ignitor.ace().handle(process.argv.slice(2))
+} catch (error) {
+  await prettyPrintError(error)
+  process.exit(1)
+}

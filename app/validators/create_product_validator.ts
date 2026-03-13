@@ -1,4 +1,4 @@
-import vine from '@adonisjs/vinejs'
+import vine from '@vinejs/vine'
 
 /**
  * Validator para validação de dados de criação de produto
@@ -12,12 +12,12 @@ export const createProductValidator = vine.compile(
     name: vine
       .string()
       .trim()
-      .minLength(2, 'Product name must be at least 2 characters')
-      .maxLength(255, 'Product name must not exceed 255 characters'),
+      .minLength(2)
+      .maxLength(255),
 
     amount: vine
       .number()
-      .min(1, 'Amount must be greater than 0')
+      .min(1)
       .withoutDecimals(),
   })
 )

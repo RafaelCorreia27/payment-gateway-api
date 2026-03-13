@@ -1,4 +1,4 @@
-import vine from '@adonisjs/vinejs'
+import vine from '@vinejs/vine'
 
 /**
  * Validator para validação de dados de atualização de gateway
@@ -15,7 +15,7 @@ export const updateGatewayValidator = vine.compile(
 
     priority: vine
       .number()
-      .min(1, 'Priority must be at least 1')
+      .min(1)
       .withoutDecimals()
       .optional(),
   })

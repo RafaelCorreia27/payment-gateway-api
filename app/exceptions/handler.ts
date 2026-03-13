@@ -1,5 +1,5 @@
 import { ExceptionHandler, HttpContext } from '@adonisjs/core/http'
-import { errors as vineErrors } from '@adonisjs/vinejs'
+import { errors as vineErrors } from '@vinejs/vine'
 import { ApiResponse } from '#services/api_response'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
@@ -7,7 +7,7 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * In debug mode, the exception handler will display verbose errors
    * with pretty printed stack traces.
    */
-  protected debug = !this.app.inProduction
+  protected debug = process.env.NODE_ENV !== 'production'
 
   /**
    * Handle known errors and return standardized JSON responses.

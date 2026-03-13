@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Payment Gateway API - Projeto desenvolvido como teste técnico backend",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "build": "node ace build",
     "start": "node server.js",
@@ -14,11 +15,22 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "imports": {
+    "#models/*": "./app/models/*.js",
+    "#validators/*": "./app/validators/*.js",
+    "#services/*": "./app/services/*.js",
+    "#middleware/*": "./app/middleware/*.js",
+    "#exceptions/*": "./app/exceptions/*.js",
+    "#controllers/*": "./app/controllers/*.js",
+    "#types/*": "./app/types/*.js",
+    "#start/*": "./start/*.js"
+  },
   "dependencies": {
     "@adonisjs/core": "^6.7.0",
+    "@adonisjs/cors": "^2.0.0",
     "@adonisjs/lucid": "^20.0.0",
-    "@adonisjs/cors": "^5.0.0",
-    "@adonisjs/vinejs": "^1.11.0",
+    "@vinejs/vine": "latest",
+    "luxon": "^3.4.4",
     "pg": "^8.11.3",
     "mysql2": "^3.9.0",
     "axios": "^1.6.0",
@@ -26,11 +38,11 @@
     "bcrypt": "^5.1.1"
   },
   "devDependencies": {
-    "@adonisjs/types": "^6.0.0",
     "@adonisjs/eslint-config": "^1.0.0",
     "@types/node": "^20.11.0",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/bcrypt": "^5.0.2",
+    "@types/luxon": "^3.3.7",
     "typescript": "^5.3.3",
     "eslint": "^8.56.0",
     "prettier": "^3.2.4",
