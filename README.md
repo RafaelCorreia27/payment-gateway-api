@@ -334,6 +334,20 @@ O sistema possui 4 níveis de acesso:
 6. Retorna resposta de sucesso para o cliente
 
 
+## 📚 Documentação da API
+
+Para documentação completa de todas as rotas, exemplos de requisições/respostas, códigos de status e erros possíveis, consulte:
+
+**[📖 Documentação Completa da API](./API_DOCUMENTATION.md)**
+
+A documentação inclui:
+- ✅ Todas as rotas públicas e privadas
+- ✅ Exemplos de requisições e respostas
+- ✅ Códigos de status HTTP
+- ✅ Erros possíveis e como tratá-los
+- ✅ Validações de cada endpoint
+- ✅ Exemplos práticos de uso
+
 ## 🧪 Testando a API
 
 ### Usuário Admin Padrão (criado pelo seeder)
@@ -361,14 +375,16 @@ curl -X POST http://localhost:3333/login \
 curl -X POST http://localhost:3333/purchases \
   -H "Content-Type: application/json" \
   -d '{
-    "product_id": 1,
+    "productId": 1,
     "quantity": 2,
-    "client_name": "João Silva",
-    "client_email": "joao@example.com",
-    "card_number": "5569000000006063",
-    "card_cvv": "010"
+    "name": "João Silva",
+    "email": "joao@example.com",
+    "cardNumber": "5569000000006063",
+    "cvv": "010"
   }'
 ```
+
+**💡 Dica:** Para mais exemplos e detalhes, consulte a [Documentação Completa da API](./API_DOCUMENTATION.md)
 
 ## 🛠️ Desenvolvimento
 
