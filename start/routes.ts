@@ -8,6 +8,8 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import jwt from 'jsonwebtoken'
+import env from '#start/env'
 import AuthController from '#controllers/auth_controller'
 import PurchaseController from '#controllers/purchase_controller'
 import GatewayController from '#controllers/gateway_controller'
@@ -17,6 +19,9 @@ import ClientController from '#controllers/client_controller'
 import TransactionController from '#controllers/transaction_controller'
 import roleMiddleware from '#middleware/role_middleware'
 import { UserRole } from '#types/user_role'
+import { ApiResponse } from '#services/api_response'
+import User from '#models/user'
+import type { JwtPayload } from '#types/jwt'
 
 // Rota de teste
 router.get('/', async () => {
@@ -39,20 +44,43 @@ router.post('/purchases', [PurchaseController, 'store'])
 // Rotas Privadas (requerem autenticação)
 // ============================================
 
-// Exemplo de rota protegida (requer autenticação)
-router
-  .get('/me', async (ctx) => {
-    return ctx.response.ok({
-      user: {
-        id: ctx.authUser!.id,
-        email: ctx.authUser!.email,
-        role: ctx.authUser!.role,
-      },
-    })
-  })
-  .use(() => import('#middleware/auth_middleware'))
+// GET /me - autenticação feita no próprio handler (garante 401 com token inválido em qualquer ambiente)
+router.get('/me', async (ctx) => {
+  const authHeader = ctx.request.header('authorization')
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return ctx.response.unauthorized(
+      ApiResponse.error('Authentication required. Please provide a valid token.', null, 'UNAUTHORIZED')
+    )
+  }
+  const token = authHeader.substring(7)
+  try {
+    const decoded = jwt.verify(token, env.get('JWT_SECRET')) as JwtPayload
+    const found = await User.find(decoded.userId)
+    if (!found) {
+      return ctx.response.unauthorized(
+        ApiResponse.error('User not found', null, 'USER_NOT_FOUND')
+      )
+    }
+    return ctx.response.ok(
+      ApiResponse.success(
+        {
+          user: {
+            id: found.id,
+            email: found.email,
+            role: found.role,
+          },
+        },
+        'User retrieved successfully'
+      )
+    )
+  } catch {
+    return ctx.response.unauthorized(
+      ApiResponse.error('Invalid token', null, 'INVALID_TOKEN')
+    )
+  }
+})
 
-// Exemplo de rota protegida com role específica (requer ADMIN ou MANAGER)
+// GET /admin-only - requer ADMIN ou MANAGER
 router
   .get('/admin-only', async (ctx) => {
     return ctx.response.ok({

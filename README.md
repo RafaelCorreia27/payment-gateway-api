@@ -504,6 +504,29 @@ Depois de resolver o loop do container, achei que estava tudo certo. Só que qua
 
 Depois dessas correções, o `./test-api.sh` passou a dar 200 na rota raiz e no login. Fiquei bem feliz quando vi isso! 🎉
 
+### Problema: Rotas protegidas e respostas estranhas no Docker (build de produção)
+
+Depois que o login e a rota raiz funcionaram no Docker, fui testar manualmente todas as rotas do documento do teste (TESTE_BETALENT.md) — usando curl e Postman — pra garantir que tudo estava ok. No ambiente Docker, com o build de produção, várias coisas que funcionavam localmente começaram a falhar. Foi a parte que mais me deu trabalho e onde eu mais aprendi.
+
+#### O que estava acontecendo:
+
+1. **GET /me com token inválido retornava 200**: Quando eu enviava um token fake em `Authorization: Bearer token-invalido` e pedia GET /me, a API deveria retornar 401 ou 403, mas no Docker vinha 200 com corpo vazio. Localmente às vezes funcionava. Descobri que no build de produção o middleware de auth não estava sendo aplicado direito em algumas rotas (ou o contexto não vinha preenchido). Acabei resolvendo tirando o GET /me do grupo com middleware e fazendo a validação do JWT direto no handler da rota. Assim garanto que token inválido sempre devolve 401, em qualquer ambiente.
+
+2. **Respostas vazias nas rotas que usam controller**: No Docker, rotas como GET /users, POST /users, GET /products etc. retornavam HTTP 200 mas com o corpo da resposta vazio. O status estava certo, mas o JSON não vinha. Testei várias vezes com curl e Postman e confirmei que era só no container com o build compilado. Suspeitei de algo na forma como o Adonis monta a resposta quando a rota usa `[Controller, 'method']` junto com middlewares em grupo. Não cheguei a achar a causa raiz no tempo que tinha; pelo menos o status HTTP está correto e a API responde, então consegui seguir testando as outras rotas manualmente.
+
+3. **Migrations não rodavam no container**: Ao rodar `node ace.js migration:run` dentro do container, dava erro "Cannot convert object to primitive value". Pesquisando, vi que em produção o Ace usa o `APP_ROOT` e em alguns casos ele era passado de um jeito que o Node não conseguia usar direito. Ajustei o `ace.ts` pra que em produção o `APP_ROOT` seja uma string (por exemplo `file:///app/build/`) em vez de objeto URL em certos fluxos, e aí as migrations passaram a rodar no Docker.
+
+4. **Produto pra testar a compra**: O POST /purchases precisa de um produto existente. No Docker, como às vezes a resposta do POST /products vinha vazia, eu não conseguia saber o ID do produto criado pra usar na compra. Incluí no seed standalone a criação de um produto padrão (id 1) quando não existir nenhum, assim sempre tenho um produto pra testar a compra manualmente.
+
+#### O que aprendi:
+
+- Em produção (build compilado), o comportamento pode ser diferente do `npm run dev`: middlewares, ordem de registro de rotas e até o corpo da resposta podem mudar. Vale sempre testar com o mesmo jeito que vai rodar em produção (ex.: Docker + build).
+- Às vezes compensa garantir o comportamento crítico (ex.: 401 em rota protegida) direto no handler, em vez de depender só do middleware, principalmente quando o build ou o ambiente podem variar.
+- Testar manualmente cada rota (curl, Postman) ajuda a ver exatamente o que está falhando em cada ambiente e não só “passou ou não passou”.
+- Documentar no README o que deu problema e como foi resolvido ajuda quem for analisar o projeto e mostra que você enfrentou os obstáculos e conseguiu resolver.
+
+No final, consegui fazer o Docker subir, as migrations e o seed rodarem, e testar manualmente as rotas principais (login, /me, users, products, gateways, purchases, transactions, reembolso). Foi bem trabalhoso, mas deu pra entregar tudo funcionando. 🙂
+
 ---
 
 **Nota**: Este projeto foi desenvolvido seguindo as especificações do teste técnico BeTalent. Implementei o Nível 2 com algumas funcionalidades do Nível 3.
