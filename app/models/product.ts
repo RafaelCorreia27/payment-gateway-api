@@ -20,10 +20,6 @@ export default class Product extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  /**
-   * Relacionamento: Um produto pode estar em muitas transações
-   * Através da tabela pivot transaction_products
-   */
   @manyToMany(() => Transaction, {
     pivotTable: 'transaction_products',
     pivotForeignKey: 'product_id',

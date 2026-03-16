@@ -23,15 +23,9 @@ export default class TransactionProduct extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  /**
-   * Relacionamento: Um transaction_product pertence a uma transação
-   */
   @belongsTo(() => Transaction)
   declare transaction: BelongsTo<typeof Transaction>
 
-  /**
-   * Relacionamento: Um transaction_product pertence a um produto
-   */
   @belongsTo(() => Product)
   declare product: BelongsTo<typeof Product>
 }

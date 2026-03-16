@@ -5,25 +5,7 @@ import { GatewayOrchestrator } from '#services/gateway_orchestrator'
 import { ApiResponse } from '#services/api_response'
 import logger from '@adonisjs/core/services/logger'
 
-/**
- * Controller responsável por visualizar e gerenciar transações
- * 
- * Funcionalidades:
- * - Listar todas as transações
- * - Detalhes de transação
- * - Processar reembolso de transação
- * 
- * Requer autenticação para visualização
- * Requer role ADMIN ou FINANCE para reembolso
- */
 export default class TransactionController {
-  /**
-   * Lista todas as transações
-   * GET /transactions
-   * 
-   * Retorna lista de transações com informações básicas
-   * Ordenadas por data (mais recentes primeiro)
-   */
   async index({ response }: HttpContext) {
     try {
       const transactions = await Transaction.query()
@@ -71,12 +53,6 @@ export default class TransactionController {
     }
   }
 
-  /**
-   * Retorna detalhes de uma transação específica
-   * GET /transactions/:id
-   * 
-   * Retorna informações completas da transação incluindo cliente, gateway e produtos
-   */
   async show({ params, response }: HttpContext) {
     try {
       const transaction = await Transaction.query()
@@ -139,18 +115,8 @@ export default class TransactionController {
     }
   }
 
-  /**
-   * Processa reembolso de uma transação
-   * POST /transactions/:id/refund
-   * 
-   * Processa reembolso através do gateway que processou a transação original
-   * Atualiza status da transação para 'refunded' se bem-sucedido
-   * 
-   * Requer role ADMIN ou FINANCE
-   */
   async refund({ params, response }: HttpContext) {
     try {
-      // Busca transação pelo ID
       const transaction = await Transaction.query()
         .where('id', params.id)
         .preload('gateway')
@@ -160,7 +126,6 @@ export default class TransactionController {
         return response.notFound(ApiResponse.error('Transaction not found', null, 'NOT_FOUND'))
       }
 
-      // Verifica se transação já foi reembolsada
       if (transaction.status === 'refunded') {
         return response.unprocessableEntity(
           ApiResponse.error(
@@ -171,7 +136,6 @@ export default class TransactionController {
         )
       }
 
-      // Verifica se transação foi aprovada (só pode reembolsar transações aprovadas)
       if (transaction.status !== 'approved') {
         return response.unprocessableEntity(
           ApiResponse.error(
@@ -182,7 +146,6 @@ export default class TransactionController {
         )
       }
 
-      // Verifica se transação tem gateway (necessário para reembolso)
       if (!transaction.gatewayId || !transaction.externalId || !transaction.gateway) {
         return response.unprocessableEntity(
           ApiResponse.error(
@@ -193,7 +156,6 @@ export default class TransactionController {
         )
       }
 
-      // Orquestra reembolso através do gateway
       const orchestrator = new GatewayOrchestrator()
 
       const refundResult = await orchestrator.processRefund(
@@ -203,7 +165,6 @@ export default class TransactionController {
         transaction.gateway.name
       )
 
-      // Se reembolso bem-sucedido, atualiza status da transação
       if (refundResult.success) {
         transaction.status = 'refunded'
         await transaction.save()
@@ -223,7 +184,6 @@ export default class TransactionController {
           )
         )
       } else {
-        // Reembolso falhou
         return response.unprocessableEntity(
           ApiResponse.error('Refund processing failed', {
             error: refundResult.error,

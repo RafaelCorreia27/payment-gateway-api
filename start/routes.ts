@@ -1,12 +1,3 @@
-/*
-|--------------------------------------------------------------------------
-| Routes file
-|--------------------------------------------------------------------------
-|
-| The routes file is used for defining the HTTP routes.
-|
-*/
-
 import router from '@adonisjs/core/services/router'
 import jwt from 'jsonwebtoken'
 import env from '#start/env'
@@ -23,28 +14,14 @@ import { ApiResponse } from '#services/api_response'
 import User from '#models/user'
 import type { JwtPayload } from '#types/jwt'
 
-// Rota de teste
 router.get('/', async () => {
-  return {
-    hello: 'world',
-  }
+  return { hello: 'world' }
 })
 
-// ============================================
-// Rotas Públicas (não requerem autenticação)
-// ============================================
-
-// Autenticação
 router.post('/login', [AuthController, 'login'])
-
-// Compras (Transações)
 router.post('/purchases', [PurchaseController, 'store'])
 
-// ============================================
-// Rotas Privadas (requerem autenticação)
-// ============================================
-
-// GET /me - autenticação feita no próprio handler (garante 401 com token inválido em qualquer ambiente)
+// /me: validação do token no handler pra garantir 401 com token inválido no Docker
 router.get('/me', async (ctx) => {
   const authHeader = ctx.request.header('authorization')
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -80,7 +57,6 @@ router.get('/me', async (ctx) => {
   }
 })
 
-// GET /admin-only - requer ADMIN ou MANAGER
 router
   .get('/admin-only', async (ctx) => {
     return ctx.response.ok({
@@ -90,7 +66,6 @@ router
   .use(() => import('#middleware/auth_middleware'))
   .use(roleMiddleware([UserRole.ADMIN, UserRole.MANAGER]))
 
-// Gateways (requer ADMIN ou MANAGER)
 router
   .group(() => {
     router.patch('/gateways/:id/toggle', [GatewayController, 'toggle'])
@@ -100,7 +75,6 @@ router
   .use(() => import('#middleware/auth_middleware'))
   .use(roleMiddleware([UserRole.ADMIN, UserRole.MANAGER]))
 
-// Usuários (requer ADMIN ou MANAGER)
 router
   .group(() => {
     router.get('/users', [UserController, 'index'])
@@ -112,7 +86,6 @@ router
   .use(() => import('#middleware/auth_middleware'))
   .use(roleMiddleware([UserRole.ADMIN, UserRole.MANAGER]))
 
-// Produtos (requer ADMIN, MANAGER ou FINANCE)
 router
   .group(() => {
     router.get('/products', [ProductController, 'index'])
@@ -124,7 +97,6 @@ router
   .use(() => import('#middleware/auth_middleware'))
   .use(roleMiddleware([UserRole.ADMIN, UserRole.MANAGER, UserRole.FINANCE]))
 
-// Clientes (requer autenticação - qualquer role)
 router
   .group(() => {
     router.get('/clients', [ClientController, 'index'])
@@ -132,7 +104,6 @@ router
   })
   .use(() => import('#middleware/auth_middleware'))
 
-// Transações (requer autenticação - qualquer role para visualizar)
 router
   .group(() => {
     router.get('/transactions', [TransactionController, 'index'])
@@ -140,7 +111,6 @@ router
   })
   .use(() => import('#middleware/auth_middleware'))
 
-// Reembolso de transações (requer ADMIN ou FINANCE)
 router
   .post('/transactions/:id/refund', [TransactionController, 'refund'])
   .use(() => import('#middleware/auth_middleware'))

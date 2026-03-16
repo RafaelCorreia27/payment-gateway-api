@@ -1,7 +1,3 @@
-/**
- * Configuração do logger (necessária para o AdonisJS)
- * Usado pelo framework para logs da aplicação.
- */
 export default {
   default: 'app',
   loggers: {

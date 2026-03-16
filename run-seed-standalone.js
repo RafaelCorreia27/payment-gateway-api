@@ -1,9 +1,5 @@
 #!/usr/bin/env node
-/**
- * Seed standalone: insere admin e gateways direto no MySQL.
- * Use no container quando "node ace.js db:seed" falha.
- * Não depende de Adonis/Lucid/Ace.
- */
+// Seed direto no MySQL (quando ace db:seed falha no container)
 import mysql from 'mysql2/promise'
 import bcrypt from 'bcrypt'
 

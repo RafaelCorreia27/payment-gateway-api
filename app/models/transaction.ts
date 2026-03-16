@@ -34,21 +34,12 @@ export default class Transaction extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  /**
-   * Relacionamento: Uma transação pertence a um cliente
-   */
   @belongsTo(() => Client)
   declare client: BelongsTo<typeof Client>
 
-  /**
-   * Relacionamento: Uma transação pertence a um gateway (pode ser null)
-   */
   @belongsTo(() => Gateway)
   declare gateway: BelongsTo<typeof Gateway>
 
-  /**
-   * Relacionamento: Uma transação tem muitos produtos (através da tabela pivot)
-   */
   @manyToMany(() => Product, {
     pivotTable: 'transaction_products',
     pivotForeignKey: 'transaction_id',
@@ -57,10 +48,6 @@ export default class Transaction extends BaseModel {
   })
   declare products: ManyToMany<typeof Product>
 
-  /**
-   * Relacionamento: Uma transação tem muitos transaction_products
-   * (acesso direto à tabela pivot com informações adicionais)
-   */
   @hasMany(() => TransactionProduct)
   declare transactionProducts: HasMany<typeof TransactionProduct>
 }

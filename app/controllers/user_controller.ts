@@ -7,25 +7,7 @@ import { ApiResponse } from '#services/api_response'
 import type { UserRoleType } from '#types/user_role'
 import logger from '@adonisjs/core/services/logger'
 
-/**
- * Controller responsável por gerenciar usuários (CRUD)
- * 
- * Funcionalidades:
- * - Listar usuários
- * - Detalhes de usuário
- * - Criar usuário
- * - Atualizar usuário
- * - Deletar usuário
- * 
- * Requer autenticação e roles ADMIN ou MANAGER
- */
 export default class UserController {
-  /**
-   * Lista todos os usuários
-   * GET /users
-   * 
-   * Retorna lista de usuários (sem senhas)
-   */
   async index({ response }: HttpContext) {
     try {
       const users = await User.all()
@@ -56,12 +38,6 @@ export default class UserController {
     }
   }
 
-  /**
-   * Retorna detalhes de um usuário específico
-   * GET /users/:id
-   * 
-   * Retorna informações do usuário (sem senha)
-   */
   async show({ params, response }: HttpContext) {
     try {
       const user = await User.find(params.id)
@@ -96,19 +72,9 @@ export default class UserController {
     }
   }
 
-  /**
-   * Cria um novo usuário
-   * POST /users
-   * 
-   * Cria usuário com email, senha e role
-   * Senha é hasheada antes de salvar
-   */
   async store({ request, response }: HttpContext) {
     try {
-      // Valida dados de entrada
       const data = await createUserValidator.validate(request.all())
-
-      // Verifica se email já existe (validação adicional)
       const existingUser = await User.findBy('email', data.email)
       if (existingUser) {
         return response.unprocessableEntity(
@@ -116,10 +82,7 @@ export default class UserController {
         )
       }
 
-      // Hash da senha
       const hashedPassword = await bcrypt.hash(data.password, 10)
-
-      // Cria usuário
       const user = await User.create({
         email: data.email,
         password: hashedPassword,
@@ -140,7 +103,6 @@ export default class UserController {
         )
       )
     } catch (error: any) {
-      // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(
           ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')
@@ -158,14 +120,6 @@ export default class UserController {
     }
   }
 
-  /**
-   * Atualiza um usuário existente
-   * PUT /users/:id
-   * 
-   * Atualiza email, senha e/ou role
-   * Apenas campos enviados são atualizados
-   * Senha é hasheada se fornecida
-   */
   async update({ params, request, response }: HttpContext) {
     try {
       const user = await User.find(params.id)
@@ -174,10 +128,8 @@ export default class UserController {
         return response.notFound(ApiResponse.error('User not found', null, 'NOT_FOUND'))
       }
 
-      // Valida dados de entrada
       const data = await updateUserValidator.validate(request.all())
 
-      // Verifica se email já existe para outro usuário (validação adicional)
       if (data.email && data.email !== user.email) {
         const existingUser = await User.findBy('email', data.email)
         if (existingUser) {
@@ -188,12 +140,10 @@ export default class UserController {
         user.email = data.email
       }
 
-      // Atualiza senha se fornecida
       if (data.password) {
         user.password = await bcrypt.hash(data.password, 10)
       }
 
-      // Atualiza role se fornecido
       if (data.role !== undefined) {
         user.role = data.role as UserRoleType
       }
@@ -214,7 +164,6 @@ export default class UserController {
         )
       )
     } catch (error: any) {
-      // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(
           ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')
@@ -232,12 +181,6 @@ export default class UserController {
     }
   }
 
-  /**
-   * Deleta um usuário
-   * DELETE /users/:id
-   * 
-   * Remove usuário do banco de dados
-   */
   async destroy({ params, response }: HttpContext) {
     try {
       const user = await User.find(params.id)
