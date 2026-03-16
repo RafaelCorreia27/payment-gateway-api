@@ -35,9 +35,11 @@
     "mysql2": "^3.9.0",
     "axios": "^1.6.0",
     "jsonwebtoken": "^9.0.2",
-    "bcrypt": "^5.1.1"
+    "bcrypt": "^5.1.1",
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
+    "@adonisjs/assembler": "^7.8.0",
     "@adonisjs/eslint-config": "^1.0.0",
     "@types/node": "^20.11.0",
     "@types/jsonwebtoken": "^9.0.5",
@@ -47,6 +49,7 @@
     "eslint": "^8.56.0",
     "prettier": "^3.2.4",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0"
+    "@typescript-eslint/parser": "^6.19.0",
+    "ts-node": "^10.9.2"
   }
 }

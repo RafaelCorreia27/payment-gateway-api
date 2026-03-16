@@ -19,11 +19,10 @@ server.errorHandler(() => import('#exceptions/handler'))
 /**
  * The server middleware stack runs on all the HTTP requests
  * even if there is no route registered for the request URL
+ * Nota: force_json_response_middleware foi removido pois mutar request.headers()
+ * pode causar 500 (objeto read-only); adonisrc já tem forceContentNegotiationTo: 'application/json'
  */
-server.use([
-  () => import('#middleware/container_bindings_middleware'),
-  () => import('#middleware/force_json_response_middleware'),
-])
+server.use([() => import('#middleware/container_bindings_middleware')])
 
 /**
  * The router middleware stack runs on all the HTTP requests
