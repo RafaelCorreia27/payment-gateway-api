@@ -1,128 +1,126 @@
 # 💳 Payment Gateway API
 
-API RESTful para um sistema de pagamentos multi-gateway desenvolvida com AdonisJS e MySQL. A aplicação processa compras tentando gateways por ordem de prioridade, com fallback automático em caso de falha. Projeto estruturado com arquitetura modular, Docker e suporte a autenticação JWT com sistema de roles.
+Olá! Este é um projeto que desenvolvi como teste técnico. É uma API REST para gerenciar pagamentos usando múltiplos gateways (Gateway 1 e Gateway 2), com fallback automático caso um deles falhe. Foi feito com AdonisJS 6, TypeScript e MySQL.
 
-## 📋 Sobre o Projeto
+A ideia é: quando alguém faz uma compra, o sistema tenta processar no primeiro gateway. Se der erro, tenta automaticamente no segundo. Bem útil pra garantir que o pagamento sempre seja processado! 💪
 
-Este projeto foi desenvolvido como teste técnico backend, implementando um sistema completo de gerenciamento de pagamentos com as seguintes características:
+## 📋 O que tem aqui
 
-- **Multi-Gateway**: Suporte a múltiplos gateways de pagamento com fallback automático
-- **Autenticação JWT**: Sistema de autenticação seguro com tokens JWT
-- **Sistema de Roles**: Controle de acesso baseado em roles (ADMIN, MANAGER, FINANCE, USER)
-- **Validação Robusta**: Validação de dados com VineJS
-- **Arquitetura Modular**: Código organizado e escalável
-- **Docker Ready**: Containerização completa com Docker e Docker Compose
+Basicamente, implementei um sistema completo de pagamentos com:
 
-## 🛠️ Stack Tecnológica
+- **Multi-Gateway**: Suporte a dois gateways diferentes com fallback automático (se um falhar, tenta o outro)
+- **Autenticação JWT**: Sistema de login com tokens JWT (bem seguro)
+- **Sistema de Roles**: Controle de acesso com 4 níveis (ADMIN, MANAGER, FINANCE, USER)
+- **Validação**: Uso VineJS pra validar os dados que chegam na API
+- **Docker**: Tudo containerizado pra facilitar o setup
+- **TypeScript**: Código tipado pra evitar erros bobos
 
-- **Runtime**: Node.js 20+
-- **Framework**: AdonisJS 6
-- **Linguagem**: TypeScript
-- **Banco de Dados**: MySQL 8.0
-- **ORM**: Lucid (AdonisJS)
-- **Validação**: VineJS
-- **Autenticação**: JWT (jsonwebtoken)
-- **Containerização**: Docker & Docker Compose
+## 🛠️ Tecnologias que usei
 
-## 📦 Requisitos
+- **Node.js** 20+ (runtime)
+- **AdonisJS 6** (framework - escolhi ele porque parece bem completo)
+- **TypeScript** (pra ter mais segurança no código)
+- **MySQL 8.0** (banco de dados)
+- **Lucid** (ORM do AdonisJS - facilita muito trabalhar com o banco)
+- **VineJS** (validação de dados)
+- **JWT** (autenticação)
+- **Docker** (containerização)
 
-### Para desenvolvimento local:
-- **Node.js** 20 ou superior
-- **npm** ou **yarn**
-- **MySQL** 8.0 ou superior (ou usar Docker)
+## 📦 O que você precisa
 
-### Para Docker:
-- **Docker** 20.10 ou superior
-- **Docker Compose** 2.0 ou superior
+### Se for rodar localmente (sem Docker):
+- Node.js 20 ou mais recente
+- npm (ou yarn, tanto faz)
+- MySQL 8.0 rodando na sua máquina
 
-## 🚀 Instalação
+### Se for usar Docker (recomendo!):
+- Docker 20.10+
+- Docker Compose 2.0+
 
-### Opção 1: Com Docker (Recomendado)
+## 🚀 Como rodar
 
-Esta é a forma mais simples e recomendada para começar:
+### Opção 1: Docker (a mais fácil!)
+
+Eu recomendo usar Docker porque já vem tudo configurado. É só rodar:
 
 ```bash
 # 1. Clone o repositório
 git clone <url-do-repositorio>
 cd payment-gateway-api
 
-# 2. Suba todos os serviços
+# 2. Sobe tudo (MySQL, API e os gateways mock)
 docker-compose up -d
 
-# 3. Aguarde os serviços iniciarem (verifique com)
+# 3. Espera um pouco e verifica se tudo subiu
 docker-compose ps
 
-# 4. Execute as migrations
-docker-compose exec app node ace migration:run
+# 4. Roda as migrations (cria as tabelas no banco)
+docker-compose exec app npx tsx run-migrations.ts
 
-# 5. Execute os seeders (cria usuário admin e gateways)
-docker-compose exec app node ace db:seed
+# 5. Roda os seeders (cria usuário admin e configura os gateways)
+docker-compose exec app npx tsx ace db:seed
 ```
 
-A aplicação estará disponível em:
+Pronto! A API deve estar rodando em:
 - **API**: http://localhost:3333
 - **Gateway 1 Mock**: http://localhost:3001
 - **Gateway 2 Mock**: http://localhost:3002
 
-### Opção 2: Desenvolvimento Local
+### Opção 2: Local (sem Docker)
 
-#### Passo 1: Instalar dependências
+Se preferir rodar direto na sua máquina:
 
+#### 1. Instala as dependências
 ```bash
 npm install
 ```
 
-#### Passo 2: Configurar banco de dados MySQL
+#### 2. Configura o MySQL
 
-Certifique-se de que o MySQL está rodando e crie o banco de dados:
+Você precisa ter o MySQL rodando e criar o banco:
 
 ```bash
-# Conectar ao MySQL
+# Conecta no MySQL
 mysql -u root -p
 
-# Criar o banco de dados
+# Cria o banco
 CREATE DATABASE payment_gateway CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-Ou consulte o arquivo [INSTRUCOES_MYSQL.md](./INSTRUCOES_MYSQL.md) para instruções detalhadas.
+Tem mais detalhes no arquivo [INSTRUCOES_MYSQL.md](./INSTRUCOES_MYSQL.md) se precisar.
 
-#### Passo 3: Configurar variáveis de ambiente
+#### 3. Configura as variáveis de ambiente
 
 ```bash
-# Copiar arquivo de exemplo
+# Copia o arquivo de exemplo
 cp env.example .env
 
-# Editar o arquivo .env com suas configurações
-# (veja seção "Variáveis de Ambiente" abaixo)
+# Edita o .env com suas configurações
+# (veja a seção de variáveis de ambiente mais abaixo)
 ```
 
-#### Passo 4: Executar migrations
-
+#### 4. Roda as migrations
 ```bash
 node ace migration:run
 ```
 
-#### Passo 5: Executar seeders
-
+#### 5. Roda os seeders
 ```bash
 node ace db:seed
 ```
 
-Isso criará:
-- Usuário admin padrão
-- Gateways configurados
+Isso vai criar:
+- Um usuário admin padrão (email: admin@example.com, senha: admin123)
+- Os gateways já configurados
 
-#### Passo 6: Iniciar o servidor de desenvolvimento
-
+#### 6. Inicia o servidor
 ```bash
 npm run dev
 ```
 
-A aplicação estará disponível em `http://localhost:3333`
+A API vai estar em `http://localhost:3333`
 
-#### Passo 7: (Opcional) Iniciar os gateways mock
-
-Se não estiver usando Docker, você precisa rodar os gateways mock separadamente:
+#### 7. (Opcional) Se não usar Docker, precisa rodar os gateways mock
 
 ```bash
 docker run -p 3001:3001 -p 3002:3002 matheusprotzen/gateways-mock
@@ -130,7 +128,7 @@ docker run -p 3001:3001 -p 3002:3002 matheusprotzen/gateways-mock
 
 ## 🔧 Variáveis de Ambiente
 
-O arquivo `.env` deve conter as seguintes variáveis:
+O arquivo `.env` precisa ter essas variáveis:
 
 ### Aplicação
 ```env
@@ -170,14 +168,16 @@ GATEWAY_2_AUTH_TOKEN=tk_f2198cc671b5289fa856
 GATEWAY_2_AUTH_SECRET=3d15e8ed6131446ea7e3456728b1211f
 ```
 
-**⚠️ Importante**: Para produção, gere chaves seguras para `APP_KEY` e `JWT_SECRET`.
+**⚠️ Atenção**: Em produção, você PRECISA gerar chaves seguras pro `APP_KEY` e `JWT_SECRET`. Não use essas de exemplo!
 
 ## 📁 Estrutura do Projeto
+
+Organizei o código assim (tentei seguir boas práticas):
 
 ```
 payment-gateway-api/
 ├── app/
-│   ├── controllers/          # Controllers da aplicação
+│   ├── controllers/          # Controllers (lógica das rotas)
 │   │   ├── auth_controller.ts
 │   │   ├── client_controller.ts
 │   │   ├── gateway_controller.ts
@@ -185,23 +185,23 @@ payment-gateway-api/
 │   │   ├── purchase_controller.ts
 │   │   ├── transaction_controller.ts
 │   │   └── user_controller.ts
-│   ├── exceptions/            # Exception handlers
+│   ├── exceptions/            # Tratamento de erros
 │   │   └── handler.ts
-│   ├── middleware/            # Middlewares
+│   ├── middleware/            # Middlewares (auth, roles, etc)
 │   │   ├── auth_middleware.ts
 │   │   ├── role_middleware.ts
 │   │   └── ...
-│   ├── models/                # Models do Lucid
+│   ├── models/                # Models do Lucid (entidades do banco)
 │   │   ├── client.ts
 │   │   ├── gateway.ts
 │   │   ├── product.ts
 │   │   ├── transaction.ts
 │   │   ├── transaction_product.ts
 │   │   └── user.ts
-│   ├── services/              # Serviços de negócio
+│   ├── services/              # Lógica de negócio (aqui que fica a mágica)
 │   │   ├── api_response.ts
 │   │   ├── base_gateway.ts
-│   │   ├── gateway_orchestrator.ts
+│   │   ├── gateway_orchestrator.ts  # Gerencia o fallback entre gateways
 │   │   ├── gateway1_service.ts
 │   │   ├── gateway2_service.ts
 │   │   └── interfaces/
@@ -210,147 +210,147 @@ payment-gateway-api/
 │   │   ├── http_context.ts
 │   │   ├── jwt.ts
 │   │   └── user_role.ts
-│   └── validators/            # Validators VineJS
+│   └── validators/            # Validadores VineJS
 │       ├── create_product_validator.ts
 │       ├── create_purchase_validator.ts
 │       ├── create_user_validator.ts
 │       ├── login_validator.ts
 │       └── ...
-├── config/                    # Arquivos de configuração
+├── config/                    # Configurações
 │   ├── app.ts
 │   ├── cors.ts
-│   └── database.ts
+│   ├── database.ts
+│   └── logger.ts
 ├── database/
-│   ├── migrations/            # Migrations do banco
-│   └── seeders/              # Seeders
+│   ├── migrations/            # Migrations (criação das tabelas)
+│   └── seeders/              # Seeders (dados iniciais)
 ├── start/
 │   ├── env.ts                # Validação de variáveis de ambiente
 │   ├── kernel.ts             # Configuração de middlewares
 │   └── routes.ts             # Definição de rotas
-├── build/                     # Arquivos compilados (gerado)
-├── Dockerfile                 # Dockerfile da aplicação
-├── docker-compose.yml         # Orquestração de serviços
-├── .dockerignore              # Arquivos ignorados no Docker
-├── env.example                # Exemplo de variáveis de ambiente
-├── package.json
-├── tsconfig.json
+├── build/                     # Arquivos compilados (gerado automaticamente)
+├── Dockerfile
+├── docker-compose.yml
 └── README.md
 ```
 
-## 🎯 Funcionalidades Principais
+## 🎯 O que a API faz
 
 ### Autenticação e Autorização
-- Login com JWT
+- Login com JWT (bem seguro)
 - Sistema de roles (ADMIN, MANAGER, FINANCE, USER)
-- Middleware de autenticação e autorização
+- Middlewares pra proteger as rotas
 
-### Gerenciamento de Usuários
+### Usuários
 - CRUD completo de usuários
-- Controle de acesso por role
+- Controle de acesso baseado em role
 
-### Gerenciamento de Produtos
+### Produtos
 - CRUD completo de produtos
 - Cálculo automático de valores
 
-### Gerenciamento de Gateways
+### Gateways
 - Ativar/desativar gateways
-- Alterar prioridade dos gateways
-- Fallback automático entre gateways
+- Mudar prioridade dos gateways
+- Fallback automático (se um falhar, tenta o outro)
 
-### Processamento de Compras
-- Criação de compras (transações)
-- Integração com múltiplos gateways
-- Fallback automático em caso de falha
-- Cálculo automático de valores (produto × quantidade)
+### Compras
+- Criar compras (transações)
+- Integração com os gateways
+- Fallback automático se um gateway falhar
+- Cálculo automático (produto × quantidade)
 
-### Gerenciamento de Transações
-- Listagem de transações
-- Detalhes de transações
-- Reembolso de transações
+### Transações
+- Listar transações
+- Ver detalhes de uma transação
+- Fazer reembolso
 
-### Gerenciamento de Clientes
-- Listagem de clientes
-- Detalhes de clientes com histórico de compras
+### Clientes
+- Listar clientes
+- Ver detalhes de um cliente (com histórico de compras)
 
-## 📝 Scripts Disponíveis
+## 📝 Scripts que tem no package.json
 
 ```bash
 # Desenvolvimento
-npm run dev              # Inicia servidor com hot-reload
+npm run dev              # Inicia o servidor com hot-reload (muito útil!)
 
 # Produção
-npm run build            # Compila TypeScript
-npm start                # Inicia servidor de produção
+npm run build            # Compila o TypeScript
+npm start                # Inicia o servidor de produção
 
 # Qualidade de código
-npm run lint             # Executa ESLint
-npm run format           # Formata código com Prettier
+npm run lint             # Roda o ESLint
+npm run format           # Formata o código com Prettier
 
 # Testes
-npm test                 # Executa testes (quando implementados)
+npm test                 # (ainda não implementei testes, mas deixei preparado)
 ```
 
-## 🐳 Comandos Docker Úteis
+## 🐳 Comandos Docker úteis
 
 ```bash
-# Subir serviços
+# Sobe tudo
 docker-compose up -d
 
-# Ver logs
+# Vê os logs
 docker-compose logs -f
-docker-compose logs -f app        # Logs apenas da aplicação
+docker-compose logs -f app        # Só os logs da aplicação
 
-# Parar serviços
+# Para tudo
 docker-compose down
 
-# Parar e remover volumes (limpar dados)
+# Para e remove os volumes (limpa os dados do banco)
 docker-compose down -v
 
-# Rebuild da aplicação
+# Rebuild da aplicação (quando mudar algo no Dockerfile)
 docker-compose up -d --build app
 
-# Executar comandos dentro do container
-docker-compose exec app node ace migration:run
-docker-compose exec app node ace db:seed
-docker-compose exec app sh         # Entrar no container
+# Executa comandos dentro do container
+docker-compose exec app npx tsx ace migration:run
+docker-compose exec app npx tsx ace db:seed
+docker-compose exec app sh         # Entra no container (útil pra debugar)
 ```
 
 ## 🔐 Sistema de Roles
 
-O sistema possui 4 níveis de acesso:
+Tem 4 níveis de acesso:
 
-- **ADMIN**: Acesso total ao sistema
+- **ADMIN**: Pode tudo (acesso total)
 - **MANAGER**: Pode gerenciar produtos e usuários
-- **FINANCE**: Pode gerenciar produtos e realizar reembolsos
-- **USER**: Acesso básico (visualizar clientes e transações)
+- **FINANCE**: Pode gerenciar produtos e fazer reembolsos
+- **USER**: Só visualiza (clientes e transações)
 
-## 🔄 Fluxo de Pagamento
+## 🔄 Como funciona o fluxo de pagamento
 
-1. Cliente faz uma compra através da rota pública `/purchases`
+1. Cliente faz uma compra pela rota pública `/purchases`
 2. Sistema calcula o valor (produto × quantidade)
-3. Sistema tenta processar no Gateway 1 (maior prioridade)
-4. Se falhar, tenta no Gateway 2 (fallback automático)
-5. Se algum gateway retornar sucesso, a transação é salva
-6. Retorna resposta de sucesso para o cliente
+3. Tenta processar no Gateway 1 primeiro (tem maior prioridade)
+4. Se o Gateway 1 falhar, tenta automaticamente no Gateway 2
+5. Se algum gateway retornar sucesso, salva a transação
+6. Retorna sucesso pro cliente
 
+Bem simples, mas funciona! 😊
 
 ## 📚 Documentação da API
 
-Para documentação completa de todas as rotas, exemplos de requisições/respostas, códigos de status e erros possíveis, consulte:
+Fiz uma documentação bem completa com todas as rotas, exemplos, códigos de status, etc. Dá uma olhada:
 
 **[📖 Documentação Completa da API](./API_DOCUMENTATION.md)**
 
-A documentação inclui:
-- ✅ Todas as rotas públicas e privadas
+Lá tem:
+- ✅ Todas as rotas (públicas e privadas)
 - ✅ Exemplos de requisições e respostas
 - ✅ Códigos de status HTTP
-- ✅ Erros possíveis e como tratá-los
+- ✅ Erros possíveis e como tratar
 - ✅ Validações de cada endpoint
-- ✅ Exemplos práticos de uso
+- ✅ Exemplos práticos
 
 ## 🧪 Testando a API
 
-### Usuário Admin Padrão (criado pelo seeder)
+### Usuário Admin padrão
+
+Quando você roda o seeder, ele cria um usuário admin:
 
 ```
 Email: admin@example.com
@@ -369,7 +369,7 @@ curl -X POST http://localhost:3333/login \
   }'
 ```
 
-### Exemplo de Compra (Pública)
+### Exemplo de Compra (rota pública)
 
 ```bash
 curl -X POST http://localhost:3333/purchases \
@@ -384,9 +384,27 @@ curl -X POST http://localhost:3333/purchases \
   }'
 ```
 
-**💡 Dica:** Para mais exemplos e detalhes, consulte a [Documentação Completa da API](./API_DOCUMENTATION.md)
+**💡 Dica**: Tem muito mais exemplos na [Documentação Completa da API](./API_DOCUMENTATION.md)
 
-## 🛠️ Desenvolvimento
+### Formas de Testar
+
+Tem várias formas de testar a API:
+
+1. **Script automatizado** (mais fácil!):
+   ```bash
+   chmod +x test-api.sh
+   ./test-api.sh
+   ```
+
+2. **cURL manual** (veja exemplos acima)
+
+3. **Postman/Insomnia** (interface gráfica)
+
+4. **HTTPie** (se tiver instalado)
+
+Tem um guia completo em [COMO_TESTAR.md](./COMO_TESTAR.md) com todos os detalhes!
+
+## 🛠️ Comandos úteis pra desenvolvimento
 
 ### Executar Migrations
 
@@ -394,8 +412,8 @@ curl -X POST http://localhost:3333/purchases \
 # Local
 node ace migration:run
 
-# Docker
-docker-compose exec app node ace migration:run
+# Docker (usando script alternativo)
+docker-compose exec app npx tsx run-migrations.ts
 ```
 
 ### Criar Nova Migration
@@ -411,10 +429,81 @@ node ace make:migration nome_da_migration
 node ace db:seed
 
 # Docker
-docker-compose exec app node ace db:seed
+docker-compose exec app npx tsx ace db:seed
 ```
 
+## 🐛 Dificuldades que encontrei
+
+Durante o desenvolvimento, encontrei algumas dificuldades que me fizeram aprender bastante. A maior delas foi fazer o servidor rodar corretamente no Docker.
+
+### Problema: Container em Loop de Reinicialização
+
+Quando tentei subir a aplicação pela primeira vez com `docker-compose up`, o container ficava em um loop infinito de reinicialização. O erro que aparecia era:
+
+```
+Error response from daemon: Container is restarting, wait until the container is running
+```
+
+Isso foi bem frustrante porque eu não conseguia nem executar comandos dentro do container para debugar. Depois de várias horas tentando resolver, descobri que o problema estava relacionado à configuração do AdonisJS v6.
+
+#### O que estava acontecendo:
+
+1. **Erro inicial**: O servidor não conseguia resolver o binding "server" do container do AdonisJS. O erro era algo como `Cannot resolve binding "server" from the container`.
+
+2. **Primeira tentativa**: Tentei adicionar o provider `app_provider` no `adonisrc.ts`, mas ainda não funcionava.
+
+3. **Descoberta do problema real**: O `APP_ROOT` no `server.ts` estava configurado como `new URL('../', import.meta.url)`, o que fazia o AdonisJS procurar arquivos no diretório errado. Mudei para `new URL('./', import.meta.url)` e isso resolveu parte do problema.
+
+4. **Novos erros apareceram**: Depois disso, apareceu um erro dizendo que o provider do Lucid não tinha export default. Descobri que o caminho correto era `@adonisjs/lucid/database_provider` e não `@adonisjs/lucid/database`.
+
+5. **Configuração do Logger**: O AdonisJS precisava de um arquivo `config/logger.ts` que eu não tinha criado. Tive que criar esse arquivo com a estrutura correta:
+   ```typescript
+   export default {
+     default: 'app',
+     loggers: {
+       app: {
+         enabled: true,
+         level: process.env.LOG_LEVEL || 'info',
+       },
+     },
+   }
+   ```
+
+6. **Configuração do App**: Também precisei adicionar as configurações de `appKey` e `http` no arquivo `config/app.ts`, porque o AdonisJS estava tentando ler essas configurações de lá também, não só do `adonisrc.ts`.
+
+#### O que aprendi:
+
+- O AdonisJS v6 tem uma estrutura de configuração diferente de versões anteriores
+- É importante entender como o `APP_ROOT` funciona e como os caminhos são resolvidos
+- A documentação do AdonisJS v6 ainda está em desenvolvimento, então tive que ler muito código fonte e fazer testes
+- Docker pode esconder alguns erros, então é importante verificar os logs com `docker-compose logs app`
+- Às vezes o problema não é o que você pensa que é - comecei achando que era problema de Docker, mas na verdade era configuração do framework
+
+No final, consegui fazer funcionar, mas foi uma jornada de aprendizado! 😅
+
+### Problema: Rotas e login retornando 500 no Docker
+
+Depois de resolver o loop do container, achei que estava tudo certo. Só que quando rodava o `test-api.sh` ou tentava acessar a API pelo navegador, a rota raiz (`/`) e o login (`POST /login`) retornavam **HTTP 500** (Internal Server Error). Foi bem chato porque localmente tudo funcionava, e no Docker não.
+
+#### O que estava acontecendo:
+
+1. **Erro nos logs**: Olhando os logs com `docker compose logs app`, vi a mensagem: `Cannot construct "[class CorsMiddleware]" class. Container is not able to resolve its dependencies. Did you forget to use @inject() decorator?`. Ou seja, o middleware de CORS não conseguia ser construído porque o container do AdonisJS não sabia como resolver as dependências dele.
+
+2. **Pesquisei e descobri**: No AdonisJS v6, cada pacote que adiciona middleware (como o CORS) precisa registrar um **provider** no `adonisrc.ts`. Eu tinha colocado o middleware no `kernel.ts` mas não tinha adicionado o provider do CORS. Corrigi colocando `() => import('@adonisjs/cors/cors_provider')` no array de `providers` do `adonisrc.ts`.
+
+3. **Outro erro na sequência**: Depois de corrigir o CORS, apareceu outro 500: `Cannot read properties of undefined (reading 'allowedMethods')` no BodyParserMiddleware. O bodyparser também precisa de uma configuração que o container consome. Descobri que faltava o arquivo `config/bodyparser.ts` com pelo menos o `allowedMethods` (POST, PUT, PATCH, DELETE). Criei esse arquivo usando o `defineConfig` do `@adonisjs/bodyparser` e exportando como default.
+
+4. **Migrations no Docker**: Tentei rodar as migrations dentro do container com `node ace.js migration:run` e apareceu o erro "Cannot convert object to primitive value" no Ace. Isso tem a ver com o modo como o Ignitor do AdonisJS lida com o `APP_ROOT` em ambiente de produção. Por enquanto, as migrations podem ser rodadas localmente antes do build, ou o banco pode já estar com as tabelas criadas. O seed no Docker funciona usando o script `run-seed-standalone.js`, que não depende do Ace.
+
+#### O que aprendi:
+
+- No AdonisJS v6, middleware que vem de pacotes (CORS, bodyparser, etc.) geralmente precisa de **provider** registrado no `adonisrc` e, quando precisa de config, de arquivo em `config/` (ex: `config/cors.ts`, `config/bodyparser.ts`).
+- Sem o provider certo, o container de IoC não sabe como instanciar o middleware e dá erro 500 em qualquer rota que use esse middleware.
+- Sempre que der 500, vale abrir os logs do container (`docker compose logs app`) pra ver a mensagem de erro real; isso me salvou várias vezes.
+- Em produção com Docker, o build gera os arquivos em `build/` e o servidor sobe com `node server.js` de dentro da pasta `build/`; aí os caminhos e configs precisam estar corretos pra esse contexto.
+
+Depois dessas correções, o `./test-api.sh` passou a dar 200 na rota raiz e no login. Fiquei bem feliz quando vi isso! 🎉
 
 ---
 
-**Nota**: Este projeto foi desenvolvido seguindo as especificações do teste técnico BeTalent, implementando o Nível 2 com algumas funcionalidades do Nível 3.
+**Nota**: Este projeto foi desenvolvido seguindo as especificações do teste técnico BeTalent. Implementei o Nível 2 com algumas funcionalidades do Nível 3.

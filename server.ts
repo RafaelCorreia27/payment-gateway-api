@@ -14,14 +14,19 @@ import { Ignitor, prettyPrintError } from '@adonisjs/core'
 
 /**
  * URL to the application root. AdonisJS need it to resolve
- * paths to file and directories for scaffolding commands
+ * paths to file and directories for scaffolding commands.
+ * Em produção passamos href (string) para evitar coerção a primitivo.
  */
-const APP_ROOT = new URL('../', import.meta.url)
+const APP_ROOT_URL = new URL('./', import.meta.url)
+const APP_ROOT: URL | string =
+  process.env.NODE_ENV === 'production' ? APP_ROOT_URL.href : APP_ROOT_URL
 
 /**
  * The ignitor will let you start the AdonisJS application
  */
-const ignitor = new Ignitor(APP_ROOT, { importer: (url) => import(url) })
+const ignitor = new Ignitor(APP_ROOT as URL, {
+  importer: (url: string | URL) => import(typeof url === 'string' ? url : url.href),
+})
 
 /**
  * Start the HTTP server

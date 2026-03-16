@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # ============================================
   # MySQL Database
@@ -31,6 +29,7 @@ services:
   # ============================================
   gateways-mock:
     image: matheusprotzen/gateways-mock:latest
+    platform: linux/amd64  # imagem só existe para amd64; no Mac (arm64) roda em emulação
     container_name: payment-gateway-mocks
     restart: unless-stopped
     ports:
@@ -39,10 +38,12 @@ services:
     networks:
       - payment-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/login"]
+      # GET em / pode responder 200; /login costuma ser POST e falha com wget
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 15s
 
   # ============================================
   # Payment Gateway API Application
@@ -87,7 +88,7 @@ services:
       mysql:
         condition: service_healthy
       gateways-mock:
-        condition: service_healthy
+        condition: service_started  # não exige healthy: mock é amd64, em arm64 pode demorar/falhar
     networks:
       - payment-network
     healthcheck:

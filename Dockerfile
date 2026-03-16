@@ -32,12 +32,15 @@ RUN apk add --no-cache wget
 # Copiar package.json e package-lock.json
 COPY package.json package-lock.json ./
 
-# Instalar apenas dependências de produção
-RUN npm ci --only=production && npm cache clean --force
+# Instalar dependências de produção + ts-node (para rodar ace.js no container: migrations, seed)
+RUN npm ci --only=production && npm install ts-node && npm cache clean --force
 
 # Copiar arquivos compilados do stage de build
 COPY --from=builder /app/build ./build
+COPY --from=builder /app/ace.js ./ace.js
 COPY --from=builder /app/ace.ts ./ace.ts
+COPY --from=builder /app/run-seed-standalone.js ./run-seed-standalone.js
+COPY --from=builder /app/adonisrc.js ./adonisrc.js
 COPY --from=builder /app/adonisrc.ts ./adonisrc.ts
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
@@ -64,5 +67,7 @@ EXPOSE 3333
 # Variável de ambiente para produção
 ENV NODE_ENV=production
 
-# Comando para iniciar a aplicação
-CMD ["node", "build/server.js"]
+# Subir a API a partir de build/ (como indicado pelo "node ace build")
+# Node resolve node_modules em /app; APP_ROOT fica file:///app/build/
+WORKDIR /app/build
+CMD ["node", "server.js"]
