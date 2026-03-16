@@ -1,16 +1,6 @@
 import vine from '@vinejs/vine'
 import { UserRole } from '#types/user_role'
 
-/**
- * Validator para validação de dados de atualização de usuário
- * 
- * Todos os campos são opcionais (apenas os enviados serão atualizados)
- * 
- * Campos validados:
- * - email: Email único e válido (opcional)
- * - password: Senha com mínimo de 6 caracteres (opcional)
- * - role: Role válido (opcional)
- */
 export const updateUserValidator = vine.compile(
   vine.object({
     email: vine

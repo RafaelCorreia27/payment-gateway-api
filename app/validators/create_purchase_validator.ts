@@ -1,18 +1,5 @@
 import vine from '@vinejs/vine'
 
-/**
- * Validator para validação de dados de compra
- * 
- * Nível 2: Valor da compra vem do produto e suas quantidades calculada via back
- * 
- * Campos validados:
- * - productId: ID do produto (deve existir no banco)
- * - quantity: Quantidade do produto (número positivo)
- * - name: Nome do comprador
- * - email: Email do comprador
- * - cardNumber: Número do cartão (16 dígitos)
- * - cvv: CVV do cartão (3-4 dígitos)
- */
 export const createPurchaseValidator = vine.compile(
   vine.object({
     productId: vine

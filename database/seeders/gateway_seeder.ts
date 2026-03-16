@@ -3,11 +3,6 @@ import Gateway from '#models/gateway'
 
 export default class extends BaseSeeder {
   async run() {
-    /**
-     * Seeder para criar os gateways iniciais
-     * Gateway 1: Prioridade 1 (será tentado primeiro)
-     * Gateway 2: Prioridade 2 (será tentado se Gateway 1 falhar)
-     */
     await Gateway.updateOrCreateMany(
       'name',
       [

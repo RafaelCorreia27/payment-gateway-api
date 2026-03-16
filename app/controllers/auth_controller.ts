@@ -9,35 +9,24 @@ import { ApiResponse } from '#services/api_response'
 import logger from '@adonisjs/core/services/logger'
 
 export default class AuthController {
-  /**
-   * Realiza login do usuário e retorna token JWT
-   * POST /login
-   */
   async login({ request, response }: HttpContext) {
     try {
-      // Valida os dados de entrada
       const { email, password } = await loginValidator.validate(request.all())
-
-      // Busca o usuário pelo email
       const user = await User.findBy('email', email)
 
-      // Verifica se o usuário existe
       if (!user) {
         return response.unauthorized(
           ApiResponse.error('Invalid credentials', null, 'INVALID_CREDENTIALS')
         )
       }
 
-      // Verifica se a senha está correta
       const isPasswordValid = await bcrypt.compare(password, user.password)
-
       if (!isPasswordValid) {
         return response.unauthorized(
           ApiResponse.error('Invalid credentials', null, 'INVALID_CREDENTIALS')
         )
       }
 
-      // Gera o token JWT
       const jwtSecret = String(env.get('JWT_SECRET'))
       const jwtExpiresIn = String(env.get('JWT_EXPIRES_IN'))
       const token = jwt.sign(
@@ -52,7 +41,6 @@ export default class AuthController {
         } as jwt.SignOptions
       )
 
-      // Retorna o token e informações do usuário (sem senha)
       return response.ok(
         ApiResponse.success(
           {
@@ -67,15 +55,12 @@ export default class AuthController {
         )
       )
     } catch (error: any) {
-      // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(
           ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')
         )
       }
-
-      // Qualquer outro erro (DB, bcrypt, etc.): retorna 401 para não vazar informações
-      // e manter consistência (credenciais inválidas = 401)
+      // Erro de DB/bcrypt: retorno 401 pra não vazar detalhes
       logger.error({ err: error }, '[AuthController] Error during login')
       return response.unauthorized(
         ApiResponse.error('Invalid credentials', null, 'INVALID_CREDENTIALS')

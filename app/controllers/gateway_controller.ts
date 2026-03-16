@@ -4,23 +4,7 @@ import { updateGatewayValidator } from '#validators/update_gateway_validator'
 import { ApiResponse } from '#services/api_response'
 import logger from '@adonisjs/core/services/logger'
 
-/**
- * Controller responsável por gerenciar gateways
- * 
- * Funcionalidades:
- * - Ativar/desativar gateway
- * - Alterar prioridade de gateway
- * 
- * Requer autenticação e roles ADMIN ou MANAGER
- */
 export default class GatewayController {
-  /**
-   * Ativa ou desativa um gateway
-   * PATCH /gateways/:id/toggle
-   * 
-   * Alterna o status isActive do gateway
-   * Se está ativo, desativa. Se está inativo, ativa.
-   */
   async toggle({ params, response }: HttpContext) {
     try {
       const gateway = await Gateway.find(params.id)
@@ -29,7 +13,6 @@ export default class GatewayController {
         return response.notFound(ApiResponse.error('Gateway not found', null, 'NOT_FOUND'))
       }
 
-      // Alterna o status
       gateway.isActive = !gateway.isActive
       await gateway.save()
 
@@ -58,13 +41,6 @@ export default class GatewayController {
     }
   }
 
-  /**
-   * Atualiza a prioridade de um gateway
-   * PATCH /gateways/:id/priority
-   * 
-   * Atualiza apenas a prioridade do gateway
-   * Valida que a prioridade é um número positivo
-   */
   async updatePriority({ params, request, response }: HttpContext) {
     try {
       const gateway = await Gateway.find(params.id)
@@ -73,7 +49,6 @@ export default class GatewayController {
         return response.notFound(ApiResponse.error('Gateway not found', null, 'NOT_FOUND'))
       }
 
-      // Valida dados de entrada
       const { priority } = await updateGatewayValidator.validate(request.all())
 
       if (priority === undefined) {
@@ -82,7 +57,6 @@ export default class GatewayController {
         )
       }
 
-      // Atualiza a prioridade
       gateway.priority = priority
       await gateway.save()
 
@@ -100,7 +74,6 @@ export default class GatewayController {
         )
       )
     } catch (error: any) {
-      // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(
           ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')
@@ -118,13 +91,6 @@ export default class GatewayController {
     }
   }
 
-  /**
-   * Atualiza gateway (método genérico)
-   * PATCH /gateways/:id
-   * 
-   * Permite atualizar isActive e/ou priority
-   * Ambos os campos são opcionais
-   */
   async update({ params, request, response }: HttpContext) {
     try {
       const gateway = await Gateway.find(params.id)
@@ -161,7 +127,6 @@ export default class GatewayController {
         )
       )
     } catch (error: any) {
-      // Se for erro de validação, retorna erro 422
       if (error.messages) {
         return response.unprocessableEntity(
           ApiResponse.error('Validation failed', error.messages, 'VALIDATION_ERROR')

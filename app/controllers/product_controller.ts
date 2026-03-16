@@ -5,25 +5,7 @@ import { updateProductValidator } from '#validators/update_product_validator'
 import { ApiResponse } from '#services/api_response'
 import logger from '@adonisjs/core/services/logger'
 
-/**
- * Controller responsável por gerenciar produtos (CRUD)
- * 
- * Funcionalidades:
- * - Listar produtos
- * - Detalhes de produto
- * - Criar produto
- * - Atualizar produto
- * - Deletar produto
- * 
- * Requer autenticação e roles ADMIN, MANAGER ou FINANCE
- */
 export default class ProductController {
-  /**
-   * Lista todos os produtos
-   * GET /products
-   * 
-   * Retorna lista de produtos com nome e valor
-   */
   async index({ response }: HttpContext) {
     try {
       const products = await Product.all()
@@ -34,7 +16,7 @@ export default class ProductController {
             products: products.map((product) => ({
               id: product.id,
               name: product.name,
-              amount: product.amount, // Valor em centavos
+              amount: product.amount,
               createdAt: product.createdAt,
               updatedAt: product.updatedAt,
             })),
@@ -54,12 +36,6 @@ export default class ProductController {
     }
   }
 
-  /**
-   * Retorna detalhes de um produto específico
-   * GET /products/:id
-   * 
-   * Retorna informações do produto
-   */
   async show({ params, response }: HttpContext) {
     try {
       const product = await Product.find(params.id)
@@ -74,7 +50,7 @@ export default class ProductController {
             product: {
               id: product.id,
               name: product.name,
-              amount: product.amount, // Valor em centavos
+              amount: product.amount,
               createdAt: product.createdAt,
               updatedAt: product.updatedAt,
             },
@@ -94,12 +70,6 @@ export default class ProductController {
     }
   }
 
-  /**
-   * Cria um novo produto
-   * POST /products
-   * 
-   * Cria produto com nome e valor (em centavos)
-   */
   async store({ request, response }: HttpContext) {
     try {
       // Valida dados de entrada
@@ -143,13 +113,6 @@ export default class ProductController {
     }
   }
 
-  /**
-   * Atualiza um produto existente
-   * PUT /products/:id
-   * 
-   * Atualiza nome e/ou valor
-   * Apenas campos enviados são atualizados
-   */
   async update({ params, request, response }: HttpContext) {
     try {
       const product = await Product.find(params.id)
@@ -204,13 +167,6 @@ export default class ProductController {
     }
   }
 
-  /**
-   * Deleta um produto
-   * DELETE /products/:id
-   * 
-   * Remove produto do banco de dados
-   * Nota: Produtos podem estar associados a transações existentes
-   */
   async destroy({ params, response }: HttpContext) {
     try {
       const product = await Product.find(params.id)

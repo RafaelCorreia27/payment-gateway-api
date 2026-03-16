@@ -7,22 +7,7 @@ import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import type { ManyToManyQueryBuilderContract } from '@adonisjs/lucid/types/relations'
 import logger from '@adonisjs/core/services/logger'
 
-/**
- * Controller responsável por visualizar clientes
- * 
- * Funcionalidades:
- * - Listar todos os clientes
- * - Detalhes de cliente com todas suas compras
- * 
- * Requer autenticação (qualquer role autenticada)
- */
 export default class ClientController {
-  /**
-   * Lista todos os clientes
-   * GET /clients
-   * 
-   * Retorna lista de clientes com informações básicas
-   */
   async index({ response }: HttpContext) {
     try {
       const clients = await Client.all()
@@ -53,12 +38,6 @@ export default class ClientController {
     }
   }
 
-  /**
-   * Retorna detalhes de um cliente específico com todas suas compras
-   * GET /clients/:id
-   * 
-   * Retorna informações do cliente e lista de todas suas transações
-   */
   async show({ params, response }: HttpContext) {
     try {
       const client = await Client.find(params.id)
@@ -67,7 +46,6 @@ export default class ClientController {
         return response.notFound(ApiResponse.error('Client not found', null, 'NOT_FOUND'))
       }
 
-      // Carrega transações do cliente com relacionamentos
       await client.load('transactions', (transactionsQuery: ModelQueryBuilderContract<typeof Transaction>) => {
         transactionsQuery
           .preload('gateway')
@@ -77,7 +55,6 @@ export default class ClientController {
           .orderBy('createdAt', 'desc')
       })
 
-      // Formata transações para resposta
       const transactions = client.transactions.map((transaction: Transaction) => ({
         id: transaction.id,
         status: transaction.status,

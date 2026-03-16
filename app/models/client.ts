@@ -19,9 +19,6 @@ export default class Client extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  /**
-   * Relacionamento: Um cliente tem muitas transações
-   */
   @hasMany(() => Transaction)
   declare transactions: HasMany<typeof Transaction>
 }
