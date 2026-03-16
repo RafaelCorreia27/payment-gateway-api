@@ -71,6 +71,19 @@ async function main() {
       }
     }
 
+    // 3. Produto padrão (para testes de compra - POST /purchases)
+    const [prodRows] = await conn.execute('SELECT id FROM products LIMIT 1')
+    if (prodRows.length === 0) {
+      const now = new Date()
+      await conn.execute(
+        'INSERT INTO products (name, amount, created_at, updated_at) VALUES (?, ?, ?, ?)',
+        ['Produto Seed', 5000, now, now]
+      )
+      console.log('✅ Produto criado: Produto Seed (id 1)')
+    } else {
+      console.log('ℹ️  Produtos já existem')
+    }
+
     console.log('Seed concluído.')
   } finally {
     await conn.end()

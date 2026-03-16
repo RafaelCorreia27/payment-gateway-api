@@ -12,18 +12,21 @@ import { Ignitor, prettyPrintError } from '@adonisjs/core'
 /**
  * URL to the application root. AdonisJS need it to resolve
  * paths to file and directories for scaffolding commands.
- * Em produção (container) passamos href (string) para evitar
- * "Cannot convert object to primitive value"; no build usamos URL.
+ * Em produção (Docker) o WORKDIR é /app/build, então usamos process.cwd().
  */
-const APP_ROOT_URL = new URL('./', import.meta.url)
-const APP_ROOT: URL | string =
-  process.env.NODE_ENV === 'production' ? APP_ROOT_URL.href : APP_ROOT_URL
+const APP_ROOT =
+  process.env.NODE_ENV === 'production'
+    ? new URL('file://' + process.cwd() + '/')
+    : new URL('./', import.meta.url)
 
 /**
  * The ignitor will let you execute ace commands
  */
-const ignitor = new Ignitor(APP_ROOT as URL, {
-  importer: (url: string | URL) => import(typeof url === 'string' ? url : url.href),
+const ignitor = new Ignitor(APP_ROOT, {
+  importer: (url: string | URL) => {
+    const specifier = typeof url === 'string' ? url : url.href
+    return import(specifier)
+  },
 })
 
 /**

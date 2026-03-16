@@ -74,10 +74,11 @@ export default class AuthController {
         )
       }
 
-      // Outros erros
+      // Qualquer outro erro (DB, bcrypt, etc.): retorna 401 para não vazar informações
+      // e manter consistência (credenciais inválidas = 401)
       logger.error({ err: error }, '[AuthController] Error during login')
-      return response.internalServerError(
-        ApiResponse.error('An error occurred during login', null, 'LOGIN_ERROR')
+      return response.unauthorized(
+        ApiResponse.error('Invalid credentials', null, 'INVALID_CREDENTIALS')
       )
     }
   }
