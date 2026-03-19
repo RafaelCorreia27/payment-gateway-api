@@ -4,6 +4,17 @@ Olá! Este é um projeto que desenvolvi como teste técnico. É uma API REST par
 
 A ideia é: quando alguém faz uma compra, o sistema tenta processar no primeiro gateway. Se der erro, tenta automaticamente no segundo. Bem útil pra garantir que o pagamento sempre seja processado! 💪
 
+## 🗂️ Organização do repositório
+
+O projeto está separado em **pastas por responsabilidade**:
+
+| Pasta / local | O que é |
+|---------------|---------|
+| **`backend/`** | Toda a **API AdonisJS**: `package.json`, `app/`, `config/`, `database/`, `start/`, `Dockerfile` da API, scripts de teste, `API_DOCUMENTATION.md`, etc. |
+| **Raiz** | `docker-compose.yml` (sobe MySQL + API + mocks), este `README`, documentação geral (`TESTE-*.md`, …) e, no futuro, **`frontend/`** (painel React — ver `FRONTEND.md`). |
+
+**Importante:** comandos como `npm install`, `npm run dev`, `node ace …` devem ser executados **dentro de `backend/`**. O **`docker compose`** continua sendo rodado **na raiz** do repositório (onde está o `docker-compose.yml`).
+
 ## 📋 O que tem aqui
 
 Basicamente, implementei um sistema completo de pagamentos com:
@@ -48,17 +59,17 @@ Eu recomendo usar Docker porque já vem tudo configurado. É só rodar:
 git clone <url-do-repositorio>
 cd payment-gateway-api
 
-# 2. Sobe tudo (MySQL, API e os gateways mock)
-docker-compose up -d
+# 2. Sobe tudo (MySQL, API e os gateways mock) — na raiz do repo
+docker compose up -d
 
 # 3. Espera um pouco e verifica se tudo subiu
-docker-compose ps
+docker compose ps
 
 # 4. Roda as migrations (cria as tabelas no banco)
-docker-compose exec app npx tsx run-migrations.ts
+docker compose exec app npx tsx run-migrations.ts
 
 # 5. Roda os seeders (cria usuário admin e configura os gateways)
-docker-compose exec app npx tsx ace db:seed
+docker compose exec app npx tsx ace db:seed
 ```
 
 Pronto! A API deve estar rodando em:
@@ -70,8 +81,9 @@ Pronto! A API deve estar rodando em:
 
 Se preferir rodar direto na sua máquina:
 
-#### 1. Instala as dependências
+#### 1. Entra na pasta do backend e instala as dependências
 ```bash
+cd backend
 npm install
 ```
 
@@ -87,12 +99,12 @@ mysql -u root -p
 CREATE DATABASE payment_gateway CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-Tem mais detalhes no arquivo [INSTRUCOES_MYSQL.md](./INSTRUCOES_MYSQL.md) se precisar.
+Tem mais detalhes no arquivo [INSTRUCOES_MYSQL.md](./backend/INSTRUCOES_MYSQL.md) se precisar.
 
 #### 3. Configura as variáveis de ambiente
 
 ```bash
-# Copia o arquivo de exemplo
+# Ainda dentro de backend/
 cp env.example .env
 
 # Edita o .env com suas configurações
@@ -128,7 +140,7 @@ docker run -p 3001:3001 -p 3002:3002 matheusprotzen/gateways-mock
 
 ## 🔧 Variáveis de Ambiente
 
-O arquivo `.env` precisa ter essas variáveis:
+Em desenvolvimento local, o arquivo **`.env`** fica na pasta **`backend/`** (ao lado do `package.json` da API). Ele precisa ter essas variáveis:
 
 ### Aplicação
 ```env
@@ -172,66 +184,44 @@ GATEWAY_2_AUTH_SECRET=3d15e8ed6131446ea7e3456728b1211f
 
 ## 📁 Estrutura do Projeto
 
-Organizei o código assim (tentei seguir boas práticas):
+Organizei o repositório assim (API isolada em **`backend/`**):
 
 ```
 payment-gateway-api/
-├── app/
-│   ├── controllers/          # Controllers (lógica das rotas)
-│   │   ├── auth_controller.ts
-│   │   ├── client_controller.ts
-│   │   ├── gateway_controller.ts
-│   │   ├── product_controller.ts
-│   │   ├── purchase_controller.ts
-│   │   ├── transaction_controller.ts
-│   │   └── user_controller.ts
-│   ├── exceptions/            # Tratamento de erros
-│   │   └── handler.ts
-│   ├── middleware/            # Middlewares (auth, roles, etc)
-│   │   ├── auth_middleware.ts
-│   │   ├── role_middleware.ts
-│   │   └── ...
-│   ├── models/                # Models do Lucid (entidades do banco)
-│   │   ├── client.ts
-│   │   ├── gateway.ts
-│   │   ├── product.ts
-│   │   ├── transaction.ts
-│   │   ├── transaction_product.ts
-│   │   └── user.ts
-│   ├── services/              # Lógica de negócio (aqui que fica a mágica)
-│   │   ├── api_response.ts
-│   │   ├── base_gateway.ts
-│   │   ├── gateway_orchestrator.ts  # Gerencia o fallback entre gateways
-│   │   ├── gateway1_service.ts
-│   │   ├── gateway2_service.ts
-│   │   └── interfaces/
-│   ├── types/                 # Tipos TypeScript
-│   │   ├── gateway.ts
-│   │   ├── http_context.ts
-│   │   ├── jwt.ts
-│   │   └── user_role.ts
-│   └── validators/            # Validadores VineJS
-│       ├── create_product_validator.ts
-│       ├── create_purchase_validator.ts
-│       ├── create_user_validator.ts
-│       ├── login_validator.ts
-│       └── ...
-├── config/                    # Configurações
-│   ├── app.ts
-│   ├── cors.ts
-│   ├── database.ts
-│   └── logger.ts
-├── database/
-│   ├── migrations/            # Migrations (criação das tabelas)
-│   └── seeders/              # Seeders (dados iniciais)
-├── start/
-│   ├── env.ts                # Validação de variáveis de ambiente
-│   ├── kernel.ts             # Configuração de middlewares
-│   └── routes.ts             # Definição de rotas
-├── build/                     # Arquivos compilados (gerado automaticamente)
-├── Dockerfile
-├── docker-compose.yml
-└── README.md
+├── backend/                   # 🔹 API AdonisJS (Node + TypeScript)
+│   ├── app/
+│   │   ├── controllers/
+│   │   ├── exceptions/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── services/
+│   │   ├── types/
+│   │   └── validators/
+│   ├── config/
+│   ├── database/
+│   │   ├── migrations/
+│   │   └── seeders/
+│   ├── start/
+│   │   ├── env.ts
+│   │   ├── kernel.ts
+│   │   └── routes.ts
+│   ├── commands/
+│   ├── package.json
+│   ├── server.ts
+│   ├── ace.ts
+│   ├── adonisrc.ts
+│   ├── Dockerfile
+│   ├── API_DOCUMENTATION.md
+│   ├── test-api.sh
+│   ├── test-all.sh
+│   └── build/                 # Gerado por `npm run build` (não commitar)
+├── docker-compose.yml         # Na raiz: sobe MySQL + API + mocks
+├── test-api.sh                # Atalho → chama backend/test-api.sh
+├── test-all.sh                # Atalho → chama backend/test-all.sh
+├── README.md
+├── BACKEND.md                 # Mapa do backend
+├── FRONTEND.md                # Plano do painel React (futuro)
+└── (futuro) frontend/         # App Vite + React — ver FRONTEND.md
 ```
 
 ## 🎯 O que a API faz
@@ -271,7 +261,11 @@ payment-gateway-api/
 
 ## 📝 Scripts que tem no package.json
 
+Rode estes comandos **dentro da pasta `backend/`** (lá está o `package.json` da API):
+
 ```bash
+cd backend
+
 # Desenvolvimento
 npm run dev              # Inicia o servidor com hot-reload (muito útil!)
 
@@ -290,26 +284,26 @@ npm test                 # (ainda não implementei testes, mas deixei preparado)
 ## 🐳 Comandos Docker úteis
 
 ```bash
-# Sobe tudo
-docker-compose up -d
+# Sobe tudo (na raiz do repositório)
+docker compose up -d
 
 # Vê os logs
-docker-compose logs -f
-docker-compose logs -f app        # Só os logs da aplicação
+docker compose logs -f
+docker compose logs -f app        # Só os logs da aplicação
 
 # Para tudo
-docker-compose down
+docker compose down
 
 # Para e remove os volumes (limpa os dados do banco)
-docker-compose down -v
+docker compose down -v
 
-# Rebuild da aplicação (quando mudar algo no Dockerfile)
-docker-compose up -d --build app
+# Rebuild da aplicação (quando mudar algo no Dockerfile em backend/)
+docker compose up -d --build app
 
 # Executa comandos dentro do container
-docker-compose exec app npx tsx ace migration:run
-docker-compose exec app npx tsx ace db:seed
-docker-compose exec app sh         # Entra no container (útil pra debugar)
+docker compose exec app npx tsx ace migration:run
+docker compose exec app npx tsx ace db:seed
+docker compose exec app sh         # Entra no container (útil pra debugar)
 ```
 
 ## 🔐 Sistema de Roles
@@ -336,7 +330,7 @@ Bem simples, mas funciona! 😊
 
 Fiz uma documentação bem completa com todas as rotas, exemplos, códigos de status, etc. Dá uma olhada:
 
-**[📖 Documentação Completa da API](./API_DOCUMENTATION.md)**
+**[📖 Documentação Completa da API](./backend/API_DOCUMENTATION.md)**
 
 Lá tem:
 - ✅ Todas as rotas (públicas e privadas)
@@ -384,7 +378,7 @@ curl -X POST http://localhost:3333/purchases \
   }'
 ```
 
-**💡 Dica**: Tem muito mais exemplos na [Documentação Completa da API](./API_DOCUMENTATION.md)
+**💡 Dica**: Tem muito mais exemplos na [Documentação Completa da API](./backend/API_DOCUMENTATION.md)
 
 ### Formas de Testar
 
@@ -392,7 +386,15 @@ Tem várias formas de testar a API:
 
 1. **Script automatizado** (mais fácil!):
    ```bash
-   chmod +x test-api.sh
+   # Opção A — na raiz do repo (atalhos que chamam backend/):
+   chmod +x test-api.sh test-all.sh
+   ./test-api.sh
+   # ou teste completo:
+   ./test-all.sh
+
+   # Opção B — direto na pasta da API:
+   cd backend
+   chmod +x test-api.sh test-all.sh
    ./test-api.sh
    ```
 
@@ -402,23 +404,25 @@ Tem várias formas de testar a API:
 
 4. **HTTPie** (se tiver instalado)
 
-Tem um guia completo em [COMO_TESTAR.md](./COMO_TESTAR.md) com todos os detalhes!
+Tem um guia completo em [COMO_TESTAR.md](./backend/COMO_TESTAR.md) com todos os detalhes!
 
 ## 🛠️ Comandos úteis pra desenvolvimento
 
 ### Executar Migrations
 
 ```bash
-# Local
+# Local (dentro de backend/)
+cd backend
 node ace migration:run
 
-# Docker (usando script alternativo)
-docker-compose exec app npx tsx run-migrations.ts
+# Docker (na raiz do repo — usando script alternativo)
+docker compose exec app npx tsx run-migrations.ts
 ```
 
 ### Criar Nova Migration
 
 ```bash
+cd backend
 node ace make:migration nome_da_migration
 ```
 
@@ -426,10 +430,11 @@ node ace make:migration nome_da_migration
 
 ```bash
 # Local
+cd backend
 node ace db:seed
 
-# Docker
-docker-compose exec app npx tsx ace db:seed
+# Docker (na raiz)
+docker compose exec app npx tsx ace db:seed
 ```
 
 ## 🐛 Dificuldades que encontrei
