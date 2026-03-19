@@ -7,4 +7,8 @@ TESTE-1.md
 TESTE-2.md
 VULNERABILITIES.md
 TESTE_BETALENT.md
-INSTRUCOES_MYSQL.md
+.env
+
+# Frontend (futuro — Vite)
+frontend/node_modules
+frontend/dist
